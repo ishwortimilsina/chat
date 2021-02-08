@@ -5,7 +5,7 @@ function MessageContainer({ messages, selectedContact }) {
     return (
         <div className="messages-container">
             {
-                messages.length
+                messages.length || selectedContact
                     ? messages.map(msg => <EachMessage selectedContact={selectedContact} key={msg.msgId} message={msg} />)
                     : <div>This is message container. Select a contact to send a message.</div>
             }

@@ -11,7 +11,11 @@ export default function ContactListItem({ item, isSelected, selectContact }) {
                 <div className="contact-list-item-name">{item.name}</div>
                 <div className="contact-list-item-last-activity">
                     <div className="contact-list-item-last-message">{item.lastMsg}</div>
-                    <div className="contact-list-item-last-active">{item.lastActive}</div>
+                    {
+                        item.isActive
+                            ? <div className="contact-list-item-active"></div>
+                            : <div className="contact-list-item-last-active">{item.lastActive}</div> 
+                    }
                 </div>
             </div>
         </div>
