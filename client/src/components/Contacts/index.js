@@ -6,6 +6,10 @@ import { connect } from 'react-redux';
 function Contacts({ contacts, selectedContact, selectContact }) {
     return (
         <div className="contacts">
+            <div className="contacts-title">
+                <img src="favicon.ico" alt="Profile" className="contacts-title-img" />
+                <div>Chats</div>
+            </div>
             <div className="contacts-list">
                 {contacts.map((item) => <ContactListItem
                     isSelected={selectedContact === item.id}

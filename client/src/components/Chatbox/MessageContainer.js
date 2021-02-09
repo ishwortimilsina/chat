@@ -3,7 +3,7 @@ import EachMessage from "./EachMessage";
 
 function MessageContainer({ messages, selectedContact }) {
     return (
-        <div className="messages-container">
+        <div className={`${!messages.length || !selectedContact ? 'empty-' : ''}messages-container`}>
             {
                 messages.length || selectedContact
                     ? messages.map(msg => <EachMessage selectedContact={selectedContact} key={msg.msgId} message={msg} />)

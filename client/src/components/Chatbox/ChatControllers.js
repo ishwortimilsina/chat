@@ -7,7 +7,7 @@ function ChatControllers(props) {
 
     const onSendClick = (e) => {
         e.preventDefault();
-        if (props.selectedContact) {
+        if (props.selectedContact && text) {
             const userId = JSON.parse(localStorage.getItem('chat-identity')).id;
 
             props.sendMessage({
@@ -20,7 +20,7 @@ function ChatControllers(props) {
         }
     }
 
-    return (
+    return props.selectedContact ? (
         <form onSubmit={onSendClick} className="chat-controllers">
             <input
                 type="text"
@@ -29,15 +29,18 @@ function ChatControllers(props) {
                 onChange={({ target }) => setText(target.value)}
                 disabled={!props.selectedContact}
             />
-            <input
-                type="submit"
-                className="sendButton"
-                onClick={onSendClick}
-                value="Send"
-                disabled={!props.selectedContact}
-            />
+            {
+                text ? (
+                    <div
+                        type="submit"
+                        className="sendButton"
+                        onClick={onSendClick}
+                        disabled={!props.selectedContact}
+                    >Send</div>
+                ) : null
+            }
         </form>
-    );
+    ) : null;
 }
 
 export default connect(null, { sendMessage })(ChatControllers);
