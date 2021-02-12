@@ -12,9 +12,9 @@ function Contacts({ contacts, selectedContact, selectContact }) {
             </div>
             <div className="contacts-list">
                 {contacts.map((item) => <ContactListItem
-                    isSelected={selectedContact === item.id}
+                    isSelected={selectedContact === item.userId}
                     selectContact={selectContact}
-                    key={item.id}
+                    key={item.userId}
                     item={item} />
                 )}
             </div>

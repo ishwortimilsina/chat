@@ -72,3 +72,28 @@
     align-items: center;
     flex: 1;
 }
+
+.chat-initiators-bar {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-end;
+    border-bottom: 2px solid lightgrey;
+    height: 75px;
+}
+
+.chat-initiators {
+    margin-left: 15px;
+    padding: 5px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.chat-initiators:hover {
+    font-weight: bold;
+}
+
+.disable {
+    pointer-events: none;
+    opacity: 0.5;
+}

@@ -1,19 +1,19 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { connect } from 'react-redux';
+import { AppContext } from "../../contexts/AppContext";
 import { sendMessage } from "../../store/actions";
 
 function ChatControllers(props) {
     const [text, setText] = useState('');
+    const cred = useContext(AppContext);
 
     const onSendClick = (e) => {
         e.preventDefault();
         if (props.selectedContact && text) {
-            const userId = JSON.parse(localStorage.getItem('chat-identity')).id;
-
             props.sendMessage({
-                recipients: [props.selectedContact],
+                recipient: props.selectedContact,
                 text,
-                sender: userId
+                sender: cred.userId
             });
 
             setText('');

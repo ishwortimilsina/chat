@@ -1,14 +1,21 @@
+import { useEffect } from 'react';
 import './contactListItem.css';
 
 export default function ContactListItem({ item, isSelected, selectContact }) {
+    // if this contact is selected, remove it from the selection
+    // when it gets removed from the contacts list
+    useEffect(() => {
+        return () => isSelected && selectContact(null);
+    }, [isSelected, selectContact]);
+
     return (
         <div
             className={`contact-list-item${isSelected ? ' contact-selected' : ''}`}
-            onClick={() => selectContact(item.id)}
+            onClick={() => selectContact(item.userId)}
         >
-            <img src={item.img} alt={item.name} className="contact-list-item-img" />
+            <img src='favicon.ico' alt={item.userName} className="contact-list-item-img" />
             <div className="contact-list-item-details">
-                <div className="contact-list-item-name">{item.name}</div>
+                <div className="contact-list-item-name">{item.userName}</div>
                 <div className="contact-list-item-last-activity">
                     <div className="contact-list-item-last-message">{item.lastMsg}</div>
                     {

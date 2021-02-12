@@ -5,22 +5,18 @@ const initialState = {};
 export default function messagesReducer(state=initialState, action) {
     switch(action.type) {
         case SEND_MESSAGE: {
-            let newState = { ...state };
-            action.recipients.forEach(recipient => {
-                newState = {
-                    ...newState,
-                    [recipient]: [
-                        ...(newState[recipient] || []),
-                        {
-                            text: action.text,
-                            sender: action.sender,
-                            time: action.time,
-                            msgId: `${action.sender}-${recipient}-${Date.now()}`
-                        }
-                    ]
-                };
-            });
-            return newState;
+            return {
+                ...state,
+                [action.recipient]: [
+                    ...(state[action.recipient] || []),
+                    {
+                        text: action.text,
+                        sender: action.sender,
+                        time: action.time,
+                        msgId: `${action.sender}-${action.recipient}-${Date.now()}`
+                    }
+                ]
+            };
         }
         case RECEIVE_MESSAGE: {
             return {

@@ -1,10 +1,10 @@
-const { contacts } = require("./contacts");
-
 const app = require("express")();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
 const PORT = process.env.PORT || 3001;
+
+const activeUsers = {};
 
 /**
  * returns are array of the userids that are connected in the chat room
@@ -21,39 +21,88 @@ function getAllConnectedChatUserIds() {
 }
 
 io.on('connection', (socket) => {
-    const clientId = socket.handshake.query.id;
-    console.log(`Client ${clientId} with socket id ${socket.id} connected.`);
+    const userId = socket.handshake.query.id;
+    console.log(`Client ${userId} with socket id ${socket.id} connected.`);
     
     // join my own room. All other users will send messages to this
     // room if they are sending it to me
-    socket.join(clientId);
+    socket.join(userId);
     socket.join('text-chat-room');
+
+    activeUsers[userId] = {
+        socketId: socket.id,
+        userId,
+        userName: socket.handshake.query.name
+    };
     
-    // send the contacts list to this client
+    // send the activeUsers list to this client
     function getAndEmitAvailableUsers() {
         const userIds = getAllConnectedChatUserIds();
-        const allContacts = contacts.filter(cont => cont.id !== clientId);
-        allContacts.forEach(cont => cont.isActive = userIds.includes(cont.id));
+        const allActiveUsers = Object.values(activeUsers).filter(cont => cont.userId !== userId);
+        allActiveUsers.forEach(cont => {
+            cont.isActive = userIds.includes(cont.userId);
+            delete cont.socketId;
+        });
 
-        socket && socket.emit('contacts-list', { contacts: allContacts });
+        socket && socket.emit('contacts-list', { contacts: allActiveUsers });
     }
     getAndEmitAvailableUsers();
     const connectedIdsChecker = setInterval(getAndEmitAvailableUsers, 10000); // try every 10 seconds
-    
-    // every time the client sends a message
-    socket.on('send-message', (data) => {
-        data.recipients.forEach(recipient => {
-            socket.to(recipient).emit('receive-message', {
-                recipients: data.recipients.filter(r => r !== recipient),
-                sender: clientId,
-                msg: data.msg,
-                time: data.time || Date.now()
+
+    socket.on('send-offer', (data) => {
+        console.log(`Sending an offer from ${userId} to ${data.recipientId}.`);
+
+        if (io.sockets.adapter.rooms.get(data.recipientId)) {
+            socket.to(data.recipientId).emit('receive-offer', {
+                offererId: userId,
+                offer: data.offer
             });
-        });
+        } else {
+            console.log(`User ${data.recipientId} is not connected.`);
+        }
+    });
+
+    socket.on('answer-offer', (data) => {
+        console.log(`${userId} answering the offer made by ${data.offererId}.`);
+
+        if (io.sockets.adapter.rooms.get(data.offererId)) {
+            socket.to(data.offererId).emit('receive-answer', {
+                answererId: userId,
+                answer: data.answer
+            });
+        } else {
+            console.log(`User ${data.offererId} is not connected.`);
+        }
+    });
+
+    socket.on('send-candidate', (data) => {
+        console.log(`Sending candidate from ${userId} to ${data.recipientId}.`);
+
+        if (io.sockets.adapter.rooms.get(data.recipientId)) {
+            socket.to(data.recipientId).emit('receive-candidate', {
+                senderId: userId,
+                candidate: data.candidate
+            });
+        } else {
+            console.log(`User id ${data.recipientId} is not connected.`);
+        }
+    });
+
+    socket.on('leave-chat', (data) => {
+        console.log(`${userId} leaving the chat with ${data.recipientId}.`);
+
+        if (io.sockets.adapter.rooms.get(data.recipientId)) {
+            socket.to(data.recipientId).emit('receive-leave', {
+                leaverId: userId
+            });
+        } else {
+            console.log(`User ${data.recipientId} is not connected.`);
+        }
     });
 
     socket.on('disconnect', () => {
-        console.log(`Client ${clientId} with socket id ${socket.id} disconnected.`);
+        console.log(`Client ${userId} with socket id ${socket.id} disconnected.`);
+        delete activeUsers[userId];
         if (connectedIdsChecker) clearInterval(connectedIdsChecker);
     });
 });
