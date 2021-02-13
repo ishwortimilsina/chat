@@ -6,20 +6,6 @@ const PORT = process.env.PORT || 3001;
 
 const activeUsers = {};
 
-/**
- * returns are array of the userids that are connected in the chat room
- */
-function getAllConnectedChatUserIds() {
-    const ids = [];
-    const allClientsInChatRoom = io.sockets.adapter.rooms.get('text-chat-room');
-    const allConnectedSockets = io.sockets.sockets
-    allClientsInChatRoom.forEach((sockId) => {
-        const sock = allConnectedSockets.get(sockId);
-        sock && ids.push(sock.handshake.query.id);
-    });
-    return ids;
-}
-
 io.on('connection', (socket) => {
     const userId = socket.handshake.query.id;
     console.log(`Client ${userId} with socket id ${socket.id} connected.`);
@@ -27,27 +13,34 @@ io.on('connection', (socket) => {
     // join my own room. All other users will send messages to this
     // room if they are sending it to me
     socket.join(userId);
-    socket.join('text-chat-room');
 
     activeUsers[userId] = {
         socketId: socket.id,
         userId,
-        userName: socket.handshake.query.name
+        userName: socket.handshake.query.name,
+        isActive: true
     };
-    
-    // send the activeUsers list to this client
-    function getAndEmitAvailableUsers() {
-        const userIds = getAllConnectedChatUserIds();
-        const allActiveUsers = Object.values(activeUsers).filter(cont => cont.userId !== userId);
-        allActiveUsers.forEach(cont => {
-            cont.isActive = userIds.includes(cont.userId);
-            delete cont.socketId;
-        });
 
-        socket && socket.emit('contacts-list', { contacts: allActiveUsers });
+    // send all currently active contacts to this user
+    function sendAllActiveContactsToThisClient() {
+        const otherUsers = Object.values(activeUsers).filter(cont => cont.userId !== userId);
+        otherUsers.forEach(cont => delete cont.socketId);
+        socket.emit('contacts-list', { contacts: otherUsers });
     }
-    getAndEmitAvailableUsers();
-    const connectedIdsChecker = setInterval(getAndEmitAvailableUsers, 10000); // try every 10 seconds
+
+    // send this client to all other clients
+    function sendThisContactActivenessToAllOtherClients(isActive) {
+        const currUser = { ...activeUsers[userId] };
+        delete currUser.socketId;
+        const otherUsers = Object.values(activeUsers).filter(cont => cont.userId !== userId);
+        otherUsers.forEach(cont => {
+            if (io.sockets.adapter.rooms.get(cont.userId)) {
+                socket.to(cont.userId).emit(isActive ? 'new-contact' : 'remove-contact', currUser);
+            }
+        });
+    }
+    sendThisContactActivenessToAllOtherClients(true);
+    sendAllActiveContactsToThisClient();
 
     socket.on('send-offer', (data) => {
         console.log(`Sending an offer from ${userId} to ${data.recipientId}.`);
@@ -102,8 +95,8 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log(`Client ${userId} with socket id ${socket.id} disconnected.`);
+        sendThisContactActivenessToAllOtherClients(false);
         delete activeUsers[userId];
-        if (connectedIdsChecker) clearInterval(connectedIdsChecker);
     });
 });
 

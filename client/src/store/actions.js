@@ -1,6 +1,10 @@
 import io from 'socket.io-client';
 
+import { appStore } from '../';
+
 export const SET_CONTACTS = 'contacts:set';
+export const ADD_CONTACT = 'contact:add';
+export const REMOVE_CONTACT = 'contact:remove';
 export const SEND_MESSAGE = 'message:send';
 export const RECEIVE_MESSAGE = 'message:receive'; 
 
@@ -26,6 +30,21 @@ export function establishConnection(id, name) {
                 });
             });
 
+            newSocket.on('new-contact', contact => {
+                setupDataConnection(contact.userId);
+                dispatch({
+                    type: ADD_CONTACT,
+                    contact
+                });
+            });
+
+            newSocket.on('remove-contact', contact => {
+                dispatch({
+                    type: REMOVE_CONTACT,
+                    contact
+                });
+            });
+
             // ********************************************************************************
             // When this user recieves an offer, create an answer and reply to the offerer
             newSocket.on('receive-offer', ({ offererId, offer }) => {
@@ -37,7 +56,7 @@ export function establishConnection(id, name) {
                 peerConnection.ondatachannel = function handleOnDataChannel(event) {
                     dataChannels[offererId] = event.channel;
                     dataChannels[offererId].onmessage = (msg) => {
-                        window.reduxStore.dispatch({
+                        appStore.dispatch({
                             type: RECEIVE_MESSAGE,
                             sender: offererId,
                             time: Date.now(),
@@ -170,10 +189,8 @@ export function createPeerConnection(recipientId) {
     };
 }
 
-export function callUser(recipientId) {
+export function setupDataConnection(recipientId) {
     createPeerConnection(recipientId);
-
-    // makeOffer(recipientId);
 
     // create a dataChannel and handle the channel events
     const peerConnection = peerConnections[recipientId];
@@ -183,7 +200,7 @@ export function callUser(recipientId) {
     dataChannel.onopen = (event) => console.log('Data channel is ready.');
     dataChannel.onerror = (error) => console.log(error);
     dataChannel.onmessage = (msg) => {
-        window.reduxStore.dispatch({
+        appStore.dispatch({
             type: RECEIVE_MESSAGE,
             sender: recipientId,
             time: Date.now(),

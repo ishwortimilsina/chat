@@ -9,9 +9,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import rootReducer from './store/reducers';
 
-const appStore = createStore(rootReducer, applyMiddleware(ReduxThunk))
-
-window.reduxStore = appStore;
+export const appStore = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
 ReactDOM.render(
     <React.StrictMode>
