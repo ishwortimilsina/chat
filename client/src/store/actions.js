@@ -67,19 +67,19 @@ export function establishConnection(id, name) {
 
             newSocket.on('receive-call-request', data => {
                 dispatch({
-                    type: data.type === 'audio' ? INCOMING_AUDIO_CALL : 'video',
+                    type: data.type === 'audio' ? INCOMING_AUDIO_CALL : INCOMING_VIDEO_CALL,
                     otherUser: data.senderId
                 });
             });
 
             newSocket.on('receive-call-accept', data => {
                 console.log(`${data.accepterId} has accepted the call request.`);
-                audioCallUser(data.accepterId);
+                data.type === 'audio' ? audioCallUser(data.accepterId) : videoCallUser(data.accepterId);
             });
 
             newSocket.on('receive-call-reject', data => {
                 dispatch({
-                    type: END_AUDIO_CALL,
+                    type: data.type === 'audio' ? END_AUDIO_CALL : END_VIDEO_CALL,
                     otherUser: data.rejecterId
                 });
             });
@@ -95,12 +95,18 @@ export function establishConnection(id, name) {
                     : audioVideoPeerConnections[offererId];
 
                 if (type !== 'datachannel') {
-                    appStore.dispatch({ type: START_AUDIO_CALL, otherUser: offererId });
+                    appStore.dispatch({
+                        type: type === 'audio' ? START_AUDIO_CALL : START_VIDEO_CALL,
+                        otherUser: offererId
+                    });
 
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: type !== 'audio',
+                        audio: true
+                    });
 
-                    audioVideoPeerConnections[offererId].localAudioStream = stream;
-                    appStore.dispatch({ type: LOCAL_AUDIO_READY });
+                    audioVideoPeerConnections[offererId][type === 'audio' ? 'localAudioStream' : 'localVideoStream'] = stream;
+                    appStore.dispatch({ type: type === 'audio' ? LOCAL_AUDIO_READY : LOCAL_VIDEO_READY });
                 } else {
                     peerConnection.ondatachannel = function handleOnDataChannel(event) {
                         dataChannelPeerConnections[offererId].dataChannel = event.channel;
@@ -124,7 +130,7 @@ export function establishConnection(id, name) {
                 peerConnection.setRemoteDescription(sessDesc)
                     .then(() => {
                         if (type !== 'datachannel') {
-                            const stream = audioVideoPeerConnections[offererId].localAudioStream;
+                            const stream = audioVideoPeerConnections[offererId][type === 'audio' ? 'localAudioStream' : 'localVideoStream'];
                             stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
                         }
                     })
@@ -152,7 +158,7 @@ export function establishConnection(id, name) {
                         ? dataChannelPeerConnections[answererId]
                         : audioVideoPeerConnections[answererId]
                 ) || {};
-                if (peerConnection) {
+                if (peerConnection && peerConnection.localDescription) {
                     peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
                         .catch(error => console.log(error));
                 }
@@ -210,7 +216,7 @@ export function sendMessage({ recipient, text, sender }) {
     }
 }
 
-export async function makeOffer(userId, type) {
+async function makeOffer(userId, type) {
     try {
         const { peerConnection } = (
             type === "datachannel"
@@ -256,7 +262,7 @@ function closePeerConnection(userId, type) {
     }
 }
 
-export function createPeerConnection(recipientId, type) {
+function createPeerConnection(recipientId, type) {
     const peerConnection = new RTCPeerConnection({
         iceServers: [
             {
@@ -284,12 +290,12 @@ export function createPeerConnection(recipientId, type) {
         }
     };
     peerConnection.ontrack = function handleOnAddStream(event) {
-        audioVideoPeerConnections[recipientId].remoteAudioStream = event.streams[0];
-        appStore.dispatch({ type: REMOTE_AUDIO_READY });
+        audioVideoPeerConnections[recipientId][type === 'audio' ? 'remoteAudioStream' : 'remoteVideoStream'] = event.streams[0];
+        appStore.dispatch({ type: type === 'audio' ? REMOTE_AUDIO_READY : REMOTE_VIDEO_READY });
     }
 }
 
-export function setupDataConnection(recipientId) {
+function setupDataConnection(recipientId) {
     createPeerConnection(recipientId, "datachannel");
 
     // create a dataChannel and handle the channel events
@@ -317,13 +323,32 @@ export async function audioCallUser(recipientId) {
 
         const stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
 
-        createPeerConnection(recipientId, "audio-video");
+        createPeerConnection(recipientId, "audio");
 
         const { peerConnection } = audioVideoPeerConnections[recipientId];
         stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
 
         audioVideoPeerConnections[recipientId].localAudioStream = stream;
         appStore.dispatch({ type: LOCAL_AUDIO_READY });
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+export async function videoCallUser(recipientId) {
+    try {
+        console.log('Initiating the video call session.');
+        appStore.dispatch({ type: START_VIDEO_CALL, otherUser: recipientId });
+
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
+        createPeerConnection(recipientId, "video");
+
+        const { peerConnection } = audioVideoPeerConnections[recipientId];
+        stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
+
+        audioVideoPeerConnections[recipientId].localVideoStream = stream;
+        appStore.dispatch({ type: LOCAL_VIDEO_READY });
     } catch (err) {
         console.log(err);
     }
@@ -367,11 +392,11 @@ export function rejectAudioVideoCall(senderId, type) {
 
 export function endAudioVideoCall(recipientId, type) {
     const { localAudioStream, localVideoStream } = audioVideoPeerConnections[recipientId] || {};
-    if (type === 'audio' && localAudioStream) {
-        localAudioStream.getAudioTracks().forEach(track => track.stop());
+    if (type === 'audio') {
+        localAudioStream && localAudioStream.getTracks().forEach(track => track.stop());
         appStore.dispatch({ type: END_AUDIO_CALL });
-    } else if (type === 'video' && localVideoStream) {
-        localVideoStream.getAudioTracks().forEach(track => track.stop());
+    } else if (type === 'video') {
+        localVideoStream && localVideoStream.getTracks().forEach(track => track.stop());
         appStore.dispatch({ type: END_VIDEO_CALL });
     }
 }
