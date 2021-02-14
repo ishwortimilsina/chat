@@ -9,7 +9,7 @@ export default function ChatContainer() {
     return (
         <div className="chat-container">
             <Contacts selectContact={selectContact} selectedContact={selectedContact} />
-            <Chatbox selectedContact={selectedContact} />
+            <Chatbox selectContact={selectContact} selectedContact={selectedContact} />
         </div>   
     );
 }

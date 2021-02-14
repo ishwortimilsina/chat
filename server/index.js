@@ -35,7 +35,7 @@ io.on('connection', (socket) => {
         const otherUsers = Object.values(activeUsers).filter(cont => cont.userId !== userId);
         otherUsers.forEach(cont => {
             if (io.sockets.adapter.rooms.get(cont.userId)) {
-                socket.to(cont.userId).emit(isActive ? 'new-contact' : 'remove-contact', currUser);
+                socket.to(cont.userId).emit(isActive ? 'new-contact' : 'remove-contact', { contact: currUser });
             }
         });
     }
@@ -48,7 +48,8 @@ io.on('connection', (socket) => {
         if (io.sockets.adapter.rooms.get(data.recipientId)) {
             socket.to(data.recipientId).emit('receive-offer', {
                 offererId: userId,
-                offer: data.offer
+                offer: data.offer,
+                type: data.type
             });
         } else {
             console.log(`User ${data.recipientId} is not connected.`);
@@ -61,7 +62,8 @@ io.on('connection', (socket) => {
         if (io.sockets.adapter.rooms.get(data.offererId)) {
             socket.to(data.offererId).emit('receive-answer', {
                 answererId: userId,
-                answer: data.answer
+                answer: data.answer,
+                type: data.type
             });
         } else {
             console.log(`User ${data.offererId} is not connected.`);
@@ -74,19 +76,60 @@ io.on('connection', (socket) => {
         if (io.sockets.adapter.rooms.get(data.recipientId)) {
             socket.to(data.recipientId).emit('receive-candidate', {
                 senderId: userId,
-                candidate: data.candidate
+                candidate: data.candidate,
+                type: data.type
             });
         } else {
             console.log(`User id ${data.recipientId} is not connected.`);
         }
     });
 
+    socket.on('request-call', (data) => {
+        console.log(`${userId} has made a call request to ${data.recipientId}`);
+
+        if (io.sockets.adapter.rooms.get(data.recipientId)) {
+            socket.to(data.recipientId).emit('receive-call-request', {
+                senderId: userId,
+                type: data.type
+            });
+        } else {
+            console.log(`User id ${data.recipientId} is not connected.`);
+        }
+    });
+
+    socket.on('accept-call', (data) => {
+        console.log(`${userId} has accepted a call request from ${data.senderId}`);
+
+        if (io.sockets.adapter.rooms.get(data.senderId)) {
+            socket.to(data.senderId).emit('receive-call-accept', {
+                accepterId: userId,
+                type: data.type
+            });
+        } else {
+            console.log(`User id ${data.senderId} is not connected.`);
+        }
+    });
+
+    socket.on('reject-call', (data) => {
+        console.log(`${userId} has rejected a call request from ${data.senderId}`);
+
+        if (io.sockets.adapter.rooms.get(data.senderId)) {
+            socket.to(data.senderId).emit('receive-call-reject', {
+                rejecterId: userId,
+                type: data.type
+            });
+        } else {
+            console.log(`User id ${data.senderId} is not connected.`);
+        }
+    });
+
     socket.on('leave-chat', (data) => {
-        console.log(`${userId} leaving the chat with ${data.recipientId}.`);
+        console.log(`${userId} leaving the ${data.type} chat with ${data.recipientId}.`);
 
         if (io.sockets.adapter.rooms.get(data.recipientId)) {
             socket.to(data.recipientId).emit('receive-leave', {
-                leaverId: userId
+                leaverId: userId,
+                type: data.type
             });
         } else {
             console.log(`User ${data.recipientId} is not connected.`);

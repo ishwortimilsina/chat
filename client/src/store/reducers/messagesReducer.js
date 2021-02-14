@@ -2,7 +2,7 @@ import { RECEIVE_MESSAGE, SEND_MESSAGE } from "../actions";
 
 const initialState = {};
 
-export default function messagesReducer(state=initialState, action) {
+export function messagesReducer(state=initialState, action) {
     switch(action.type) {
         case SEND_MESSAGE: {
             return {
