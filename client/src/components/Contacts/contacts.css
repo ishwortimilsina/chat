@@ -12,14 +12,19 @@
 }
 
 .contacts-title {
-    height: 75px;
+    height: 130px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 10px 10px 10px;
+    justify-content: space-between;
+}
+
+.contacts-title-title {
     display: flex;
     align-items: center;
     text-transform: uppercase;
     font-weight: bold;
     letter-spacing: 2px;
-    padding: 0 10px;
-    border-bottom: 2px solid #a5b0bc;
 }
 
 .contacts-title-img {
@@ -27,4 +32,14 @@
     width: 40px;
     margin-right: 15px;
     border-radius: 50%;
+}
+
+.search-input {
+    padding: 10px 20px;
+    font-size: 0.8em;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    background-color: #76c8b8;
+    color: white;
 }
