@@ -1,5 +1,5 @@
 .chatbox {
-    border-left: thin solid #374b5f;
+    border-left: thin solid #a5b0bc;
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -78,7 +78,7 @@
     width: 100%;
     align-items: center;
     justify-content: flex-end;
-    border-bottom: 2px solid lightgrey;
+    border-bottom: 2px solid #a5b0bc;
     height: 75px;
 }
 

@@ -1,16 +1,8 @@
 .App {
-    text-align: center;
-    background-color: #282c34;
-}
-
-.App-header {
-    min-height: 10vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+    text-align: justify;
+    background-color: #25997c;
+    font-family: Segoe UI Historic, Segoe UI, Helvetica, Arial, sans-serif;
+    color: #923107;
 }
 
 .App-link {

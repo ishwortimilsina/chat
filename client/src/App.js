@@ -20,9 +20,6 @@ function App({ establishConnection }) {
     return (
         <AppContext.Provider value={{...cred}}>
             <div className="App">
-                <header className="App-header">
-                    Chat App
-                </header>
                 <MainContainer />
             </div>
         </AppContext.Provider>

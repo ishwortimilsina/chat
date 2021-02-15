@@ -13,7 +13,9 @@ export default function ContactListItem({ item, isSelected, selectContact }) {
             className={`contact-list-item${isSelected ? ' contact-selected' : ''}`}
             onClick={() => selectContact(item.userId)}
         >
-            <img src='favicon.ico' alt={item.userName} className="contact-list-item-img" />
+            <div className="contact-list-item-img-container">
+                <img className="contact-list-item-img" src='favicon.ico' alt={item.userName} />
+            </div>
             <div className="contact-list-item-details">
                 <div className="contact-list-item-name">{item.userName}</div>
                 <div className="contact-list-item-last-activity">

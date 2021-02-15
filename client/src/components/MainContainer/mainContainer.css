@@ -2,5 +2,6 @@
     display: flex;
     justify-content: center;
     color: white;
-    height: 90vh;
+    height: 100vh;
+    letter-spacing: 1px;
 }
