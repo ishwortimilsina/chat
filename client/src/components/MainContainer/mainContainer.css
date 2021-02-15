@@ -1,7 +1,7 @@
 .main-container {
     display: flex;
     justify-content: center;
-    color: white;
+    color: #273159;
     height: 100vh;
     letter-spacing: 1px;
 }

@@ -35,17 +35,18 @@
 }
 
 .contact-list-item-name {
-    font-weight: bold;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: black;
 }
 
 .contact-list-item-last-activity {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #9a9bab;
+    color: #434450;
+    font-style: italic;
 }
 
 .contact-list-item-active {

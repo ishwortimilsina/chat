@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { connect } from 'react-redux';
 import { AppContext } from "../../contexts/AppContext";
 import { sendMessage } from "../../store/actions";
-import { SendMessage } from "../common/icons/SendMessage";
+import SendMessageIcon from "../common/icons/SendMessageIcon";
 
 function ChatControllers(props) {
     const [text, setText] = useState('');
@@ -32,8 +32,9 @@ function ChatControllers(props) {
             />
             {
                 text ? (
-                    <SendMessage
+                    <SendMessageIcon
                         type="submit"
+                        tooltip="Send"
                         className="sendButton"
                         onClick={onSendClick}
                         disabled={!props.selectedContact}

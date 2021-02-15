@@ -1,6 +1,7 @@
-export function SendMessage(props) {
+export default function SendMessageIcon({ tooltip, ...otherProps }) {
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"  {...props}>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"  {...otherProps}>
+            <title>{tooltip}</title>
             <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

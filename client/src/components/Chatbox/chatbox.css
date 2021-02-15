@@ -67,21 +67,40 @@
     flex: 1;
 }
 
-.chat-initiators-bar {
+.chat-title-bar {
     display: flex;
     width: 100%;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     border-bottom: 2px solid #a5b0bc;
     height: 75px;
     padding: 0 10px;
 }
 
+.chat-title {
+    display: flex;
+    color: #273159;
+}
+
+.chat-title-name {
+    font-weight: bold;
+}
+
+.chat-title-availability {
+    display: flex;
+    align-items: center;
+}
+
+.chat-title-availability > div {
+    margin-right: 10px;
+}
+
 .chat-initiators {
     margin-left: 15px;
-    padding: 5px;
-    font-size: 20px;
+    height: 32px;
+    width: 32px;
     cursor: pointer;
+    color: #a01e1e;
 }
 
 .chat-initiators:hover {
@@ -154,4 +173,36 @@
 .call-buttons:hover {
     background-color: #b6bec5;
     color: #35597e;
+}
+
+.outgoing-call, .incoming-call {
+    height: 100px;
+    width: 100px;
+}
+
+.accept-reject-buttons-container {
+    display: flex;
+}
+
+.accept-reject-buttons-container > div {
+    margin-right: 20px;
+}
+
+.end-call-button, .accept-call-button {
+    padding: 8px 15px 4px 15px;
+    border-radius: 10px;
+    width: 80px;
+    background-color: white;
+    cursor: pointer;
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.end-call-button:hover, .end-call-button:active {
+    background-color: rgb(212, 181, 181);
+}
+
+.accept-call-button:hover, .accept-call-button:active {
+    background-color: rgb(173, 211, 170);
 }
