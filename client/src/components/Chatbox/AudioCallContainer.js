@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import { endAudioVideoCall, acceptAudioVideoCall, rejectAudioVideoCall, leaveChat, audioCallUser } from '../../store/actions';
+import { endAudioVideoCall, acceptAudioVideoCall, rejectAudioVideoCall, leaveChat } from '../../store/actions';
 import EndCallIcon from '../common/icons/EndCallIcon';
 import IncomingCallIcon from '../common/icons/IncomingCallIcon';
 import OutgoingCallIcon from '../common/icons/OutgoingCallIcon';

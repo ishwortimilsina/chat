@@ -7,11 +7,13 @@ import AudioCallContainer from './AudioCallContainer';
 import './chatbox.css';
 import ChatControllers from './ChatControllers';
 import MessageContainer from './MessageContainer';
+import OtherUserDisconnected from './OtherUserDisconnected';
 import VideoCallContainer from './VideoCallContainer';
 
 function Chatbox({ selectedContact, selectedContactName, selectContact, sendCallRequest, audioCall, videoCall }) {
     const shouldShowAudioCallContainer = audioCall.ongoing || audioCall.callRequested || audioCall.acceptedRequest || audioCall.incomingRequest;
     const shouldShowVideoCallContainer = videoCall.ongoing || videoCall.callRequested || videoCall.acceptedRequest || videoCall.incomingRequest;
+    const showOtherUserDisconnected = audioCall.disconnected || videoCall.disconnected;
 
     return (
         <section className="chatbox">
@@ -38,10 +40,15 @@ function Chatbox({ selectedContact, selectedContactName, selectContact, sendCall
                 </div>
             </div>
             {
-                shouldShowAudioCallContainer || shouldShowVideoCallContainer
+                shouldShowAudioCallContainer || shouldShowVideoCallContainer || showOtherUserDisconnected
                     ? shouldShowAudioCallContainer
                         ? <AudioCallContainer audioCall={audioCall} selectContact={selectContact} />
-                        : <VideoCallContainer videoCall={videoCall} selectContact={selectContact} />
+                        : shouldShowVideoCallContainer
+                            ? <VideoCallContainer videoCall={videoCall} selectContact={selectContact} />
+                            : <OtherUserDisconnected
+                                otherUser={audioCall.disconnected ? audioCall.otherUser : videoCall.otherUser}
+                                type={audioCall.disconnected ? 'audio' : 'video'}
+                            />
                     : (
                         <>
                             <MessageContainer selectedContact={selectedContact} />

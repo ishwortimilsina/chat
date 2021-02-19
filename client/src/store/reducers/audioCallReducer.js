@@ -12,7 +12,8 @@ const initialState = {
     acceptedRequest: false,
     otherUser: undefined,
     localAudioReady: undefined,
-    remoteAudioReady: undefined
+    remoteAudioReady: undefined,
+    disconnected: false
 };
 
 export function audioCallReducer(state = initialState, action) {
@@ -35,7 +36,7 @@ export function audioCallReducer(state = initialState, action) {
             return { ...state, remoteAudioReady: true };
         case REMOVE_CONTACT:
             if (action.contact.userId === state.otherUser) {
-                return initialState;
+                return { ...initialState, otherUser: state.otherUser, disconnected: true };
             }
             return state;
         default:

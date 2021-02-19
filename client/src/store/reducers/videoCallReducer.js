@@ -1,6 +1,7 @@
 import {
     ACCEPT_VIDEO_CALL, END_VIDEO_CALL, INCOMING_VIDEO_CALL,
     LOCAL_VIDEO_READY, REJECT_VIDEO_CALL, REMOTE_VIDEO_READY, 
+    REMOVE_CONTACT, 
     REQUEST_VIDEO_CALL, START_VIDEO_CALL 
 } from "../actions";
 
@@ -32,6 +33,11 @@ export function videoCallReducer(state = initialState, action) {
             return { ...state, localVideoReady: true };
         case REMOTE_VIDEO_READY:
             return { ...state, remoteVideoReady: true };
+        case REMOVE_CONTACT:
+            if (action.contact.userId === state.otherUser) {
+                return { ...initialState, otherUser: state.otherUser, disconnected: true };
+            }
+            return state;
         default:
             return state;
     }

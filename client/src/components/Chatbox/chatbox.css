@@ -204,6 +204,12 @@
     color: green;
 }
 
+.missed-call {
+    height: 100px;
+    width: 100px;
+    color: #b82121;
+}
+
 .accept-reject-buttons-container {
     display: flex;
 }
