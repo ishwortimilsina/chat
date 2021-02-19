@@ -1,42 +1,31 @@
-import { useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 
-import { endAudioVideoCall, acceptAudioVideoCall, rejectAudioVideoCall, leaveChat, audioVideoPeerConnections } from '../../store/actions';
+import { endAudioVideoCall, acceptAudioVideoCall, rejectAudioVideoCall, leaveChat, audioCallUser } from '../../store/actions';
 import EndCallIcon from '../common/icons/EndCallIcon';
 import IncomingCallIcon from '../common/icons/IncomingCallIcon';
 import OutgoingCallIcon from '../common/icons/OutgoingCallIcon';
-import VoiceCallIcon from '../common/icons/VoiceCallIcon';
+import AudioCalOnGoing from './AudiCallOnGoing';
+import CallNotifier from './CallNotifier';
 
 function AudioCallContainer({ audioCall, acceptAudioVideoCall, rejectAudioVideoCall, selectContact }) {
-    const localAudioRef = useRef();
-    const remoteAudioRef = useRef();
-
-    useEffect(() => {
-        if (audioCall.ongoing && audioCall.otherUser && audioVideoPeerConnections[audioCall.otherUser]) {
-            const { localAudioStream, remoteAudioStream } = audioVideoPeerConnections[audioCall.otherUser];
-            localAudioRef.current.srcObject = localAudioStream;
-            remoteAudioRef.current.srcObject = remoteAudioStream;
-        }
-    }, [audioCall]);
-
     return (
         <div className="audios-container">
             {
                 audioCall.callRequested ? (
-                    <>
+                    <CallNotifier>
                         <OutgoingCallIcon className="outgoing-call" />
-                        <span>Calling {audioCall.otherUser}...</span>
+                        <span style={{fontWeight: "bold"}}>{audioCall.otherUser}</span>
                         <div className="end-call-button" onClick={() => {
                             endAudioVideoCall(audioCall.otherUser, 'audio');
                             leaveChat(audioCall.otherUser, 'audio');
                         }}>
                             <EndCallIcon style={{ height: 30, width: 30 }} />
                         </div>
-                    </>
+                    </CallNotifier>
                 ) : audioCall.incomingRequest ? (
-                    <>
+                    <CallNotifier>
                         <IncomingCallIcon className="incoming-call" />
-                        <span>{audioCall.otherUser} is calling you...</span>
+                        <span style={{fontWeight: "bold"}}>{audioCall.otherUser}</span>
                         <div className="accept-reject-buttons-container">
                             <div 
                                 className="accept-call-button"
@@ -56,27 +45,10 @@ function AudioCallContainer({ audioCall, acceptAudioVideoCall, rejectAudioVideoC
                                 <EndCallIcon style={{ height: 30, width: 30 }} />
                             </div>
                         </div>
-                    </>
-                ) : audioCall.acceptedRequest ? (
-                    <>
-                        <span>Connecting...</span>
-                    </>
-                ) : (
-                    <>
-                        <div className="local-audio-container"> 
-                            <span>Local audio</span>
-                            <audio ref={localAudioRef}></audio> 
-                        </div>
-                        <div className="remote-audio-container">
-                            <span>Remote audio</span>
-                            <audio ref={remoteAudioRef} autoPlay></audio> 
-                        </div>
-                        <div className="call-buttons" onClick={() => {
-                            endAudioVideoCall(audioCall.otherUser, 'audio');
-                            leaveChat(audioCall.otherUser, 'audio');
-                        }}>End Call</div>
-                    </>
-                )
+                    </CallNotifier>
+                ) : audioCall.acceptedRequest 
+                    ? <span>Connecting...</span>
+                    : <AudioCalOnGoing endAudioVideoCall={endAudioVideoCall} audioCall={audioCall} />
             }
         </div>
     );

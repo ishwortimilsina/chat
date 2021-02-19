@@ -24,7 +24,7 @@ function VideoCallContainer({ videoCall, acceptAudioVideoCall, rejectAudioVideoC
                 videoCall.callRequested ? (
                     <>
                         <OutgoingCallIcon className="outgoing-call" />
-                        <span>Calling {videoCall.otherUser}...</span>
+                        <span style={{fontWeight: "bold"}}>{videoCall.otherUser}</span>
                         <div className="end-call-button" onClick={() => {
                             endAudioVideoCall(videoCall.otherUser, 'video');
                             leaveChat(videoCall.otherUser, 'video');
@@ -35,7 +35,7 @@ function VideoCallContainer({ videoCall, acceptAudioVideoCall, rejectAudioVideoC
                 ) : videoCall.incomingRequest ? (
                     <>
                         <IncomingCallIcon className="incoming-call" />
-                        <span>{videoCall.otherUser} is calling you...</span>
+                        <span style={{fontWeight: "bold"}}>{videoCall.otherUser}</span>
                         <div className="accept-reject-buttons-container">
                             <div
                                 className="accept-call-button"
@@ -68,10 +68,16 @@ function VideoCallContainer({ videoCall, acceptAudioVideoCall, rejectAudioVideoC
                         <div className="local-video-container"> 
                             <video className="local-video" ref={localVideoRef} autoPlay muted></video> 
                         </div>
-                        <div className="call-buttons end-button" onClick={() => {
-                            endAudioVideoCall(videoCall.otherUser, 'video');
-                            leaveChat(videoCall.otherUser, 'video');
-                        }}>End Call</div>
+                        <div
+                            className="end-call-button"
+                            onClick={() => {
+                                endAudioVideoCall(videoCall.otherUser, 'video');
+                                leaveChat(videoCall.otherUser, 'video');
+                            }}
+                            title="End Call"
+                        >
+                            <EndCallIcon style={{ height: 30, width: 30 }} />
+                        </div>
                     </>
                 )
             }

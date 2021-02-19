@@ -32,7 +32,7 @@ let dataChannelPeerConnections = {};
 export let audioVideoPeerConnections = {};
 
 export function establishConnection(id, name) {
-    return async (dispatch) => {
+    return async (dispatch, store) => {
         try {
             newSocket = await io(
                 'http://localhost:3001',

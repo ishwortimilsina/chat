@@ -1,6 +1,7 @@
 import {
     ACCEPT_AUDIO_CALL, END_AUDIO_CALL, INCOMING_AUDIO_CALL,
     LOCAL_AUDIO_READY, REJECT_AUDIO_CALL, REMOTE_AUDIO_READY,
+    REMOVE_CONTACT,
     REQUEST_AUDIO_CALL, START_AUDIO_CALL
 } from "../actions";
 
@@ -32,6 +33,11 @@ export function audioCallReducer(state = initialState, action) {
             return { ...state, localAudioReady: true };
         case REMOTE_AUDIO_READY:
             return { ...state, remoteAudioReady: true };
+        case REMOVE_CONTACT:
+            if (action.contact.userId === state.otherUser) {
+                return initialState;
+            }
+            return state;
         default:
             return state;
     }
