@@ -1,28 +1,18 @@
-import { useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 
-import { endAudioVideoCall, acceptAudioVideoCall, rejectAudioVideoCall, leaveChat, audioVideoPeerConnections } from '../../store/actions';
+import { endAudioVideoCall, acceptAudioVideoCall, rejectAudioVideoCall, leaveChat } from '../../store/actions';
 import EndCallIcon from '../common/icons/EndCallIcon';
 import IncomingCallIcon from '../common/icons/IncomingCallIcon';
 import OutgoingCallIcon from '../common/icons/OutgoingCallIcon';
+import CallNotifier from './CallNotifier';
+import VideoCallOngoing from './VideoCallOngoing';
 
 function VideoCallContainer({ videoCall, acceptAudioVideoCall, rejectAudioVideoCall, selectContact }) {
-    const localVideoRef = useRef();
-    const remoteVideoRef = useRef();
-
-    useEffect(() => {
-        if (videoCall.ongoing && videoCall.otherUser && audioVideoPeerConnections[videoCall.otherUser]) {
-            const { localVideoStream, remoteVideoStream } = audioVideoPeerConnections[videoCall.otherUser];
-            localVideoRef.current.srcObject = localVideoStream;
-            remoteVideoRef.current.srcObject = remoteVideoStream;
-        }
-    }, [videoCall]);
-
     return (
         <div className="videos-container">
             {
                 videoCall.callRequested ? (
-                    <>
+                    <CallNotifier>
                         <OutgoingCallIcon className="outgoing-call" />
                         <span style={{fontWeight: "bold"}}>{videoCall.otherUser}</span>
                         <div className="end-call-button" onClick={() => {
@@ -31,9 +21,9 @@ function VideoCallContainer({ videoCall, acceptAudioVideoCall, rejectAudioVideoC
                         }}>
                             <EndCallIcon style={{ height: 30, width: 30 }} />
                         </div>
-                    </>
+                    </CallNotifier>
                 ) : videoCall.incomingRequest ? (
-                    <>
+                    <CallNotifier>
                         <IncomingCallIcon className="incoming-call" />
                         <span style={{fontWeight: "bold"}}>{videoCall.otherUser}</span>
                         <div className="accept-reject-buttons-container">
@@ -55,31 +45,10 @@ function VideoCallContainer({ videoCall, acceptAudioVideoCall, rejectAudioVideoC
                                 <EndCallIcon style={{ height: 30, width: 30 }} />
                             </div>
                         </div>
-                    </>
-                ) : videoCall.acceptedRequest ? (
-                    <>
-                        <span>Connecting...</span>
-                    </>
-                ) : (
-                    <>
-                        <div className="remote-video-container">
-                            <video className="remote-video" ref={remoteVideoRef} autoPlay></video> 
-                        </div>
-                        <div className="local-video-container"> 
-                            <video className="local-video" ref={localVideoRef} autoPlay muted></video> 
-                        </div>
-                        <div
-                            className="end-call-button"
-                            onClick={() => {
-                                endAudioVideoCall(videoCall.otherUser, 'video');
-                                leaveChat(videoCall.otherUser, 'video');
-                            }}
-                            title="End Call"
-                        >
-                            <EndCallIcon style={{ height: 30, width: 30 }} />
-                        </div>
-                    </>
-                )
+                    </CallNotifier>
+                ) : videoCall.acceptedRequest
+                    ? <span>Connecting...</span>
+                    : <VideoCallOngoing endAudioVideoCall={endAudioVideoCall} videoCall={videoCall} />
             }
         </div>
     );

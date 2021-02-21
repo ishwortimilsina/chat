@@ -4,4 +4,5 @@
     color: #273159;
     height: 100vh;
     letter-spacing: 1px;
+    overflow: hidden;
 }

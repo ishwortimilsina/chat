@@ -134,6 +134,14 @@
     justify-content: center;
     align-items: center;
     position: relative;
+    height: 100%;
+}
+
+.actual-videos-container {
+    position: relative;
+    /* display: flex; */
+    height: 100%;
+    width: 100%;
 }
 
 .local-video-container, .remote-video-container {
@@ -145,6 +153,14 @@
 
 .local-video-container {
     align-self: flex-end;
+    position: absolute;
+    bottom: 10%;
+    right: 5%;
+}
+
+.remote-video-container {
+    height: 100%;
+    object-fit: cover;
 }
 
 .local-video {
@@ -154,6 +170,14 @@
 .remote-video {
     width: 100%;
     min-width: 200px;
+    object-fit: contain;
+    height: 100%;
+}
+
+.video-call-end-call-button {
+    position: absolute;
+    bottom: 10%;
+    left: 45%;
 }
 
 .call-notifier-container {
