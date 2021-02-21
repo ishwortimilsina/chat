@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 
 import { audioVideoPeerConnections, leaveChat } from "../../store/actions";
 import EndCallIcon from "../common/icons/EndCallIcon";
+import { UserCircleIcon } from "../common/icons/UserCircleIcon";
 import useTimer from "../hooks/useTimer";
 
 export default function AudioCalOnGoing({ endAudioVideoCall, audioCall }) {
@@ -12,14 +13,15 @@ export default function AudioCalOnGoing({ endAudioVideoCall, audioCall }) {
         if (audioCall.ongoing && audioCall.otherUser && audioVideoPeerConnections[audioCall.otherUser]) {
             const { remoteAudioStream } = audioVideoPeerConnections[audioCall.otherUser];
             remoteAudioRef.current.srcObject = remoteAudioStream;
-            remoteAudioStream && console.log(remoteAudioStream);
         }
     }, [audioCall]);
 
     return (
         <>
             <div className="remote-audio-container">
-                <span>{durationString}</span>
+                <UserCircleIcon className="audio-ongoing-user-img" />
+                <div>Call on-going with {audioCall.otherUser}</div>
+                <div className="ongoing-call-timer">{durationString}</div>
                 <audio ref={remoteAudioRef} autoPlay></audio> 
             </div>
             <div

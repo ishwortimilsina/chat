@@ -236,3 +236,14 @@
 .accept-call-button:hover, .accept-call-button:active {
     background-color: rgb(173, 211, 170);
 }
+
+.audio-ongoing-user-img {
+    height: 300px;
+    width: 300px;
+}
+
+.ongoing-call-timer {
+    font-size: 30px;
+    font-weight: bold;
+    color: #a63a3a;
+}
