@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 
 import { audioVideoPeerConnections, leaveChat } from "../../store/actions";
 import EndCallIcon from "../common/icons/EndCallIcon";
-import { UserCircleIcon } from "../common/icons/UserCircleIcon";
+import UserCircleIcon from "../common/icons/UserCircleIcon";
 import useTimer from "../hooks/useTimer";
 
 export default function AudioCalOnGoing({ endAudioVideoCall, audioCall }) {

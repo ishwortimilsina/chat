@@ -1,5 +1,5 @@
 import { connect } from "react-redux";
-import { WriteNewIcon } from "../common/icons/WriteNewIcon";
+import WriteNewIcon from "../common/icons/WriteNewIcon";
 import EachMessage from "./EachMessage";
 
 function MessageContainer({ messages, selectedContact }) {

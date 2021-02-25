@@ -73,6 +73,7 @@
 
 .empty-messages-message {
     color: #721717;
+    font-weight: bold;
 }
 
 .chat-title-bar {

@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 
 import { sendCallRequest, rejectAudioVideoCall } from '../../store/actions';
+import ShareIcon from '../common/icons/ShareIcon';
 import VideoCallIcon from '../common/icons/VideoCallIcon';
 import VoiceCallIcon from '../common/icons/VoiceCallIcon';
 import AudioCallContainer from './AudioCallContainer';
@@ -35,6 +36,7 @@ function Chatbox({ selectedContact, selectedContactName, selectContact, sendCall
                     ) : <span>Select a contact to start chatting.</span>}
                 </div>
                 <div className={`${!selectedContact || shouldShowAudioCallContainer || shouldShowVideoCallContainer ? ' disable' : ''}`}>
+                    <ShareIcon tooltip="Share File" className="chat-initiators" onClick={() => sendCallRequest(selectedContact, 'audio')} />
                     <VoiceCallIcon tooltip="Voice Call" className="chat-initiators" onClick={() => sendCallRequest(selectedContact, 'audio')} />
                     <VideoCallIcon tooltip="Video Call" className="chat-initiators" onClick={() => sendCallRequest(selectedContact, 'video')} />
                 </div>
