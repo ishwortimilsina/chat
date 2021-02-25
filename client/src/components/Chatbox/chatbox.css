@@ -67,6 +67,14 @@
     flex: 1;
 }
 
+.no-contact-selected-icon {
+    height: 120px;
+}
+
+.empty-messages-message {
+    color: #721717;
+}
+
 .chat-title-bar {
     display: flex;
     width: 100%;
