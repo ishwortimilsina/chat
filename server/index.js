@@ -136,6 +136,46 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('request-share-file', (data) => {
+        console.log(`${userId} has made a file sharing request to ${data.recipientId}`);
+
+        if (io.sockets.adapter.rooms.get(data.recipientId)) {
+            socket.to(data.recipientId).emit('receive-share-file-request', { senderId: userId });
+        } else {
+            console.log(`User id ${data.recipientId} is not connected.`);
+        }
+    });
+
+    socket.on('accept-share-file-request', (data) => {
+        console.log(`${userId} has accepted a file sharing request from ${data.senderId}`);
+
+        if (io.sockets.adapter.rooms.get(data.senderId)) {
+            socket.to(data.senderId).emit('receive-share-file-accept', { accepterId: userId });
+        } else {
+            console.log(`User id ${data.senderId} is not connected.`);
+        }
+    });
+
+    socket.on('reject-share-file-request', (data) => {
+        console.log(`${userId} has rejected a file sharing request from ${data.senderId}`);
+
+        if (io.sockets.adapter.rooms.get(data.senderId)) {
+            socket.to(data.senderId).emit('receive-share-file-reject', { rejecterId: userId });
+        } else {
+            console.log(`User id ${data.senderId} is not connected.`);
+        }
+    });
+
+    socket.on('leave-file-sharing', (data) => {
+        console.log(`${userId} leaving the file-sharing with ${data.recipientId}.`);
+
+        if (io.sockets.adapter.rooms.get(data.recipientId)) {
+            socket.to(data.recipientId).emit('receive-share-file-leave', { leaverId: userId });
+        } else {
+            console.log(`User ${data.recipientId} is not connected.`);
+        }
+    });
+
     socket.on('disconnect', () => {
         console.log(`Client ${userId} with socket id ${socket.id} disconnected.`);
         sendThisContactActivenessToAllOtherClients(false);

@@ -27,6 +27,13 @@ export const END_VIDEO_CALL = 'video:end-call';
 export const LOCAL_VIDEO_READY = 'video:local-stream-ready';
 export const REMOTE_VIDEO_READY = 'video:remote-stream-ready';
 
+export const REQUEST_SHARE_FILE = 'share-file:request';
+export const INCOMING_SHARE_FILE_REQUEST = 'share-file:incoming';
+export const ACCEPT_SHARE_FILE_REQUEST = 'share-file:accept';
+export const REJECT_SHARE_FILE_REQUEST = 'share-file:reject';
+export const START_SHARE_FILE = 'share-file:start';
+export const END_SHARE_FILE = 'share-file:end';
+
 let newSocket = null;
 let dataChannelPeerConnections = {};
 export let audioVideoPeerConnections = {};
@@ -73,13 +80,30 @@ export function establishConnection(id, name) {
             });
 
             newSocket.on('receive-call-accept', data => {
-                console.log(`${data.accepterId} has accepted the call request.`);
                 data.type === 'audio' ? audioCallUser(data.accepterId) : videoCallUser(data.accepterId);
             });
 
             newSocket.on('receive-call-reject', data => {
                 dispatch({
                     type: data.type === 'audio' ? END_AUDIO_CALL : END_VIDEO_CALL,
+                    otherUser: data.rejecterId
+                });
+            });
+
+            newSocket.on('receive-share-file-request', data => {
+                dispatch({
+                    type: INCOMING_SHARE_FILE_REQUEST,
+                    otherUser: data.senderId
+                });
+            });
+
+            newSocket.on('receive-share-file-accept', data => {
+                startFileSharing(data.accepterId);
+            });
+
+            newSocket.on('receive-share-file-reject', data => {
+                dispatch({
+                    type: END_SHARE_FILE,
                     otherUser: data.rejecterId
                 });
             });
@@ -188,6 +212,11 @@ export function establishConnection(id, name) {
                     endAudioVideoCall(leaverId, type);
                 }
                 closePeerConnection(leaverId, type);
+            });
+
+            newSocket.on('receive-share-file-leave', ({ leaverId }) => {
+                console.log(`Received a file-sharing leave message from ${leaverId}.`);
+                endFileSharing(leaverId);
             });
 
         } catch (ex) {
@@ -404,4 +433,58 @@ export function endAudioVideoCall(recipientId, type) {
 export function leaveChat(recipientId, type) {
     closePeerConnection(recipientId, type);
     newSocket && newSocket.emit('leave-chat', { recipientId, type });
+}
+
+export function openFileSharingWidget(recipientId) {
+    return (dispatch) => {
+        if (newSocket) {
+            newSocket.emit('request-share-file', { recipientId });
+            dispatch({
+                type: REQUEST_SHARE_FILE,
+                otherUser: recipientId
+            });
+        }
+    }
+}
+
+export function acceptShareFile(senderId) {
+    return (dispatch) => {
+        if (newSocket) {
+            newSocket.emit('accept-share-file-request', { senderId });
+            dispatch({
+                type: ACCEPT_SHARE_FILE_REQUEST,
+                otherUser: senderId
+            });
+        }
+    }
+}
+
+export function rejectShareFile(senderId) {
+    return async (dispatch) => {
+        if (newSocket) {
+            await newSocket.emit('reject-share-file-request', { senderId });
+            dispatch({
+                type: REJECT_SHARE_FILE_REQUEST,
+                otherUser: senderId
+            });
+        }
+    }
+}
+
+function startFileSharing(recipientId) {
+    appStore.dispatch({ type: START_SHARE_FILE, otherUser: recipientId });
+}
+
+export function endFileSharing(recipientId) {
+    appStore.dispatch({ type: END_SHARE_FILE });
+}
+
+export function leaveFileSharing(recipientId) {
+    newSocket && newSocket.emit('leave-file-sharing', { recipientId });
+}
+
+export function sendFile(recipientId, file) {
+    if (newSocket) {
+        newSocket.emit('request-send-file')
+    }
 }

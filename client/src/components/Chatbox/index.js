@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import { sendCallRequest, rejectAudioVideoCall } from '../../store/actions';
+import { sendCallRequest, rejectAudioVideoCall, openFileSharingWidget } from '../../store/actions';
 import ShareIcon from '../common/icons/ShareIcon';
 import VideoCallIcon from '../common/icons/VideoCallIcon';
 import VoiceCallIcon from '../common/icons/VoiceCallIcon';
@@ -9,12 +9,14 @@ import './chatbox.css';
 import ChatControllers from './ChatControllers';
 import MessageContainer from './MessageContainer';
 import OtherUserDisconnected from './OtherUserDisconnected';
+import ShareFileContainer from './ShareFileContainer';
 import VideoCallContainer from './VideoCallContainer';
 
-function Chatbox({ selectedContact, selectedContactName, selectContact, sendCallRequest, audioCall, videoCall }) {
+function Chatbox({ selectedContact, selectedContactName, selectContact, sendCallRequest, openFileSharingWidget, audioCall, videoCall, shareFile }) {
     const shouldShowAudioCallContainer = audioCall.ongoing || audioCall.callRequested || audioCall.acceptedRequest || audioCall.incomingRequest;
     const shouldShowVideoCallContainer = videoCall.ongoing || videoCall.callRequested || videoCall.acceptedRequest || videoCall.incomingRequest;
-    const showOtherUserDisconnected = audioCall.disconnected || videoCall.disconnected;
+    const shouldShowShareFileContainer = shareFile.ongoing || shareFile.shareRequested || shareFile.acceptedRequest || shareFile.incomingRequest;
+    const showOtherUserDisconnected = audioCall.disconnected || videoCall.disconnected || shareFile.disconnected;
 
     return (
         <section className="chatbox">
@@ -35,22 +37,24 @@ function Chatbox({ selectedContact, selectedContactName, selectContact, sendCall
                         </>
                     ) : <span>Select a contact to start chatting.</span>}
                 </div>
-                <div className={`${!selectedContact || shouldShowAudioCallContainer || shouldShowVideoCallContainer ? ' disable' : ''}`}>
-                    <ShareIcon tooltip="Share File" className="chat-initiators" onClick={() => sendCallRequest(selectedContact, 'audio')} />
+                <div className={`${!selectedContact || shouldShowAudioCallContainer || shouldShowVideoCallContainer || shouldShowShareFileContainer ? ' disable' : ''}`}>
+                    <ShareIcon tooltip="Share File" className="chat-initiators" onClick={() => openFileSharingWidget(selectedContact)} />
                     <VoiceCallIcon tooltip="Voice Call" className="chat-initiators" onClick={() => sendCallRequest(selectedContact, 'audio')} />
                     <VideoCallIcon tooltip="Video Call" className="chat-initiators" onClick={() => sendCallRequest(selectedContact, 'video')} />
                 </div>
             </div>
             {
-                shouldShowAudioCallContainer || shouldShowVideoCallContainer || showOtherUserDisconnected
+                shouldShowAudioCallContainer || shouldShowVideoCallContainer || shouldShowShareFileContainer || showOtherUserDisconnected
                     ? shouldShowAudioCallContainer
                         ? <AudioCallContainer audioCall={audioCall} selectContact={selectContact} />
                         : shouldShowVideoCallContainer
                             ? <VideoCallContainer videoCall={videoCall} selectContact={selectContact} />
-                            : <OtherUserDisconnected
-                                otherUser={audioCall.disconnected ? audioCall.otherUser : videoCall.otherUser}
-                                type={audioCall.disconnected ? 'audio' : 'video'}
-                            />
+                            : shouldShowShareFileContainer 
+                                ? <ShareFileContainer shareFile={shareFile} selectContact={selectContact} />
+                                : <OtherUserDisconnected
+                                    otherUser={audioCall.disconnected ? audioCall.otherUser : videoCall.otherUser}
+                                    type={audioCall.disconnected ? 'audio' : 'video'}
+                                />
                     : (
                         <>
                             <MessageContainer selectedContact={selectedContact} />
@@ -65,7 +69,8 @@ function Chatbox({ selectedContact, selectedContactName, selectContact, sendCall
 const mapStateToProps = (state, ownProps) => ({
     audioCall: state.audioCall,
     videoCall: state.videoCall,
+    shareFile: state.shareFile,
     selectedContactName: (state.contacts.filter(cont => cont.userId === ownProps.selectedContact)[0] || {}).userName
 });
 
-export default connect(mapStateToProps, { sendCallRequest, rejectAudioVideoCall })(Chatbox);
+export default connect(mapStateToProps, { sendCallRequest, rejectAudioVideoCall, openFileSharingWidget })(Chatbox);

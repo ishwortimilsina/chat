@@ -5,7 +5,7 @@ import EndCallIcon from "../common/icons/EndCallIcon";
 import UserCircleIcon from "../common/icons/UserCircleIcon";
 import useTimer from "../hooks/useTimer";
 
-export default function AudioCalOnGoing({ endAudioVideoCall, audioCall }) {
+export default function AudioCallOngoing({ endAudioVideoCall, audioCall }) {
     const remoteAudioRef = useRef();
     const { durationString } = useTimer();
 

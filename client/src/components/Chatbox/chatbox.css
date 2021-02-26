@@ -280,3 +280,72 @@
     font-weight: bold;
     color: #a63a3a;
 }
+
+.share-file-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.share-file-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.share-file-file-upload-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#share-file-file-upload {
+    display: none;
+}
+
+.custom-share-file-upload {
+    background: #ddd;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 8px 10px;
+}
+
+.custom-share-file-upload:hover {
+    background: #afb0c0;
+}
+
+.custom-share-file-upload:active {
+    background: #9697a3;
+}
+
+.file-upload-filename {
+    margin-left: 15px;
+    font-weight: bold;
+    color: black;
+}
+
+.share-file-submit {
+    margin-top: 25px;
+    padding: 8px 10px;
+    font-weight: bold;
+    border-radius: 5px;
+    background: #ddd;
+    cursor: pointer;
+    min-width: 80px;
+    display: flex;
+    justify-content: center;
+}
+
+.share-file-submit:hover {
+    background: #afb0c0;
+}
+
+.share-file-submit:active {
+    background: #9697a3;
+}

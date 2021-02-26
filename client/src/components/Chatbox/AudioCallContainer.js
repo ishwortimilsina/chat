@@ -4,7 +4,7 @@ import { endAudioVideoCall, acceptAudioVideoCall, rejectAudioVideoCall, leaveCha
 import EndCallIcon from '../common/icons/EndCallIcon';
 import IncomingCallIcon from '../common/icons/IncomingCallIcon';
 import OutgoingCallIcon from '../common/icons/OutgoingCallIcon';
-import AudioCalOnGoing from './AudiCallOnGoing';
+import AudioCallOngoing from './AudiCallOngoing';
 import CallNotifier from './CallNotifier';
 
 function AudioCallContainer({ audioCall, acceptAudioVideoCall, rejectAudioVideoCall, selectContact }) {
@@ -48,7 +48,7 @@ function AudioCallContainer({ audioCall, acceptAudioVideoCall, rejectAudioVideoC
                     </CallNotifier>
                 ) : audioCall.acceptedRequest 
                     ? <span>Connecting...</span>
-                    : <AudioCalOnGoing endAudioVideoCall={endAudioVideoCall} audioCall={audioCall} />
+                    : <AudioCallOngoing endAudioVideoCall={endAudioVideoCall} audioCall={audioCall} />
             }
         </div>
     );
