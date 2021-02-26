@@ -33,6 +33,19 @@ export const ACCEPT_SHARE_FILE_REQUEST = 'share-file:accept';
 export const REJECT_SHARE_FILE_REQUEST = 'share-file:reject';
 export const START_SHARE_FILE = 'share-file:start';
 export const END_SHARE_FILE = 'share-file:end';
+export const SHARE_FILE_METADATA = 'share-file:metadata';
+export const SHARE_FILE_RECEIVE_DATA = 'share-file:receive-data';
+export const SHARE_FILE_SEND_DATA = 'share-file:send-data'
+
+/**
+ * 
+ * @param {number} duration // in milliseconds 
+ */
+function delay(duration) {
+    return new Promise((resolve) => {
+        setTimeout(() => resolve(), duration);
+    });
+};
 
 let newSocket = null;
 let dataChannelPeerConnections = {};
@@ -134,14 +147,7 @@ export function establishConnection(id, name) {
                 } else {
                     peerConnection.ondatachannel = function handleOnDataChannel(event) {
                         dataChannelPeerConnections[offererId].dataChannel = event.channel;
-                        dataChannelPeerConnections[offererId].dataChannel.onmessage = (msg) => {
-                            appStore.dispatch({
-                                type: RECEIVE_MESSAGE,
-                                sender: offererId,
-                                time: Date.now(),
-                                text: msg.data
-                            });
-                        }
+                        dataChannelPeerConnections[offererId].dataChannel.onmessage = (msg) => handleChannelMessage(msg, offererId);
                     }
                 }
 
@@ -230,7 +236,7 @@ export function sendMessage({ recipient, text, sender }) {
         try {
             const { dataChannel } = dataChannelPeerConnections[recipient] || {};
             if (dataChannel && dataChannel.readyState === 'open') {
-                dataChannel.send(text);
+                dataChannel.send(JSON.stringify({ type: "text-message", text }));
                 dispatch({
                     type: SEND_MESSAGE,
                     recipient,
@@ -324,6 +330,50 @@ function createPeerConnection(recipientId, type) {
     }
 }
 
+function handleChannelMessage(msg, sender) {
+    let data;
+    try {
+        data = JSON.parse(msg.data);
+    } catch (err) {
+        data = msg.data;
+    }
+
+    if (data.type === "text-message") {
+        appStore.dispatch({
+            type: RECEIVE_MESSAGE,
+            sender,
+            time: Date.now(),
+            text: data.text
+        });
+    } else if (data.type === "file-metadata") {
+        appStore.dispatch({
+            type: SHARE_FILE_METADATA,
+            otherUser: sender,
+            fileName: data.fileName,
+            fileSize: data.fileSize
+        });
+    } else {
+        const fileData = data;
+
+        const shareFileState = appStore.getState().shareFile;
+
+        let { bytesReceived, downloadProgress, shareFileData, shareFileMetadata } = shareFileState;
+        if (shareFileData) {
+            bytesReceived += fileData.byteLength;
+            downloadProgress = (bytesReceived * 100 / shareFileMetadata.fileSize).toFixed(2);
+            shareFileData = [ ...shareFileData, fileData ];
+
+            // ******update the store so that the receiver can update the UI accordingly
+            appStore.dispatch({
+                type: SHARE_FILE_RECEIVE_DATA,
+                bytesReceived,
+                downloadProgress,
+                shareFileData
+            });
+        }
+    }
+}
+
 function setupDataConnection(recipientId) {
     createPeerConnection(recipientId, "datachannel");
 
@@ -334,14 +384,7 @@ function setupDataConnection(recipientId) {
 
     dataChannel.onopen = (event) => console.log('Data channel is ready.');
     dataChannel.onerror = (error) => console.log(error);
-    dataChannel.onmessage = (msg) => {
-        appStore.dispatch({
-            type: RECEIVE_MESSAGE,
-            sender: recipientId,
-            time: Date.now(),
-            text: msg.data
-        });
-    }
+    dataChannel.onmessage = (msg) => handleChannelMessage(msg, recipientId)
     dataChannel.onclose = (event) => console.log('Data channel is closed');
 }
 
@@ -483,8 +526,58 @@ export function leaveFileSharing(recipientId) {
     newSocket && newSocket.emit('leave-file-sharing', { recipientId });
 }
 
-export function sendFile(recipientId, file) {
-    if (newSocket) {
-        newSocket.emit('request-send-file')
+const BYTES_PER_CHUNK = 16000;
+export async function sendFile(recipientId, file) {
+    let currentChunk = 0;
+    let fileReader = new FileReader();
+    const fileSize = file.size;
+    const fileName = file.name;
+    let bytesSent = 0, uploadProgress = 0;
+
+    const { dataChannel } = dataChannelPeerConnections[recipientId] || {};
+    if (dataChannel && dataChannel.readyState === 'open') {
+        dataChannel.send(JSON.stringify({
+            type: "file-metadata",
+            fileName,
+            fileSize
+        }));
+
+        function readNextChunk() {
+            const start = BYTES_PER_CHUNK * currentChunk;
+            const end = Math.min(fileSize, start + BYTES_PER_CHUNK);
+            fileReader.readAsArrayBuffer(file.slice(start, end));
+        }
+    
+        fileReader.onload = function() {
+            // we are reading the file as array buffer, it cannot be directly sent as stringified json
+            // need to be decoded/encoded. This is not reliable for all kinds of files
+            // so we will directly send the array buffer chunks
+            dataChannel.send(fileReader.result);
+
+            // ******update the store so that the sender can update the UI accordingly
+            bytesSent += fileReader.result.byteLength;
+            uploadProgress = bytesSent * 100 / fileSize;
+            appStore.dispatch({
+                type: SHARE_FILE_SEND_DATA,
+                bytesSent,
+                uploadProgress
+            });
+            // ********
+
+            currentChunk++;
+        
+            if( BYTES_PER_CHUNK * currentChunk < fileSize ) {
+                readNextChunk();
+            }
+        };
+
+        await delay(1000);
+
+        readNextChunk();
     }
+}
+
+export function endFileDownload(otherUser) {
+    leaveFileSharing(otherUser);
+    appStore.dispatch({ type: END_SHARE_FILE });
 }

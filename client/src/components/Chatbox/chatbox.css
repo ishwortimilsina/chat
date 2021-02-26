@@ -349,3 +349,25 @@
 .share-file-submit:active {
     background: #9697a3;
 }
+
+.download-file-button {
+    text-decoration: none;
+    margin-top: 25px;
+    padding: 8px 10px;
+    font-weight: bold;
+    border-radius: 5px;
+    background: #a74629;
+    cursor: pointer;
+    min-width: 80px;
+    display: flex;
+    justify-content: center;
+    color: black;
+}
+
+.download-file-button:hover {
+    background: #afb0c0;
+}
+
+.download-file-button:active {
+    background: #9697a3;
+}

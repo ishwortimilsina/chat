@@ -1,6 +1,7 @@
 import {
     ACCEPT_SHARE_FILE_REQUEST, END_SHARE_FILE, INCOMING_SHARE_FILE_REQUEST,
-    REJECT_SHARE_FILE_REQUEST, REMOVE_CONTACT, REQUEST_SHARE_FILE, START_SHARE_FILE
+    REJECT_SHARE_FILE_REQUEST, REMOVE_CONTACT, REQUEST_SHARE_FILE, SHARE_FILE_METADATA, 
+    SHARE_FILE_RECEIVE_DATA, SHARE_FILE_SEND_DATA, START_SHARE_FILE
 } from "../actions";
 
 const initialState = {
@@ -9,6 +10,12 @@ const initialState = {
     incomingRequest: false,
     acceptedRequest: false,
     otherUser: undefined,
+    shareFileMetadata: {},
+    downloadProgress: 0,
+    bytesReceived: 0,
+    shareFileData: undefined,
+    bytesSent: 0,
+    uploadProgress: 0,
     disconnected: false
 };
 
@@ -31,6 +38,29 @@ export function shareFileReducer(state = initialState, action) {
                 return { ...initialState, otherUser: state.otherUser, disconnected: true };
             }
             return state;
+        case SHARE_FILE_METADATA:
+            return {
+                ...initialState,
+                ongoing: true,
+                otherUser: action.otherUser,
+                shareFileMetadata: { fileName: action.fileName, fileSize: action.fileSize },
+                bytesReceived: 0,
+                downloadProgress: 0,
+                shareFileData: []
+            };
+        case SHARE_FILE_RECEIVE_DATA:
+            return {
+                ...state,
+                bytesReceived: action.bytesReceived,
+                downloadProgress: action.downloadProgress,
+                shareFileData: action.shareFileData
+            };
+        case SHARE_FILE_SEND_DATA:
+            return {
+                ...state,
+                bytesSent: action.bytesSent,
+                uploadProgress: action.uploadProgress
+            };
         default:
             return state;
     }
