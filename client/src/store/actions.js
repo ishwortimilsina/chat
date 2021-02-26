@@ -1,4 +1,5 @@
 import io from 'socket.io-client';
+import * as streamSaver from 'streamsaver';
 
 import { appStore } from '../';
 
@@ -330,47 +331,80 @@ function createPeerConnection(recipientId, type) {
     }
 }
 
-function handleChannelMessage(msg, sender) {
-    let data;
-    try {
-        data = JSON.parse(msg.data);
-    } catch (err) {
-        data = msg.data;
+/**
+ * Converts an array buffer to string 
+ * @param {ArrayBuffer} buff 
+ */
+function arrBuffToStr(buff) {
+    return String.fromCharCode.apply(null, new Uint8Array(buff));
+}
+
+/**
+ * Converts an string to an array buffer
+ * @param {string} str 
+ */
+function strToArrBuff(str) {
+    const buff = new ArrayBuffer(str.length);
+    const buffView = new Uint8Array(buff);
+    for (let i = 0, strLen = str.length; i < strLen; i++) {
+        buffView[i] = str.charCodeAt(i);
     }
+    return buff;
+}
 
-    if (data.type === "text-message") {
-        appStore.dispatch({
-            type: RECEIVE_MESSAGE,
-            sender,
-            time: Date.now(),
-            text: data.text
-        });
-    } else if (data.type === "file-metadata") {
-        appStore.dispatch({
-            type: SHARE_FILE_METADATA,
-            otherUser: sender,
-            fileName: data.fileName,
-            fileSize: data.fileSize
-        });
-    } else {
-        const fileData = data;
+let downloadStream, downloadWriter;
+function handleChannelMessage(msg, sender) {
+    try {
+        const data = JSON.parse(msg.data);
 
-        const shareFileState = appStore.getState().shareFile;
+        if (data.type === "text-message") {
+            appStore.dispatch({
+                type: RECEIVE_MESSAGE,
+                sender,
+                time: Date.now(),
+                text: data.text
+            });
+        } else if (data.type === "file-metadata") {
+            appStore.dispatch({
+                type: SHARE_FILE_METADATA,
+                otherUser: sender,
+                fileName: data.fileName,
+                fileSize: data.fileSize,
+                downloadStartTime: Date.now()
+            });
 
-        let { bytesReceived, downloadProgress, shareFileData, shareFileMetadata } = shareFileState;
-        if (shareFileData) {
+            downloadStream = streamSaver.createWriteStream(data.fileName);
+            downloadWriter = downloadStream.getWriter();
+        } else if (data.type === "file-data" && data.fileData) {
+            // array buffer cannot be transmitted as a stringified json
+            // so it's sent as encoded to string which we convert back here
+            const fileData = strToArrBuff(data.fileData);
+
+            const shareFileState = appStore.getState().shareFile;
+
+            let { bytesReceived, downloadProgress, downloadStartTime, shareFileMetadata } = shareFileState;
             bytesReceived += fileData.byteLength;
             downloadProgress = (bytesReceived * 100 / shareFileMetadata.fileSize).toFixed(2);
-            shareFileData = [ ...shareFileData, fileData ];
 
             // ******update the store so that the receiver can update the UI accordingly
             appStore.dispatch({
                 type: SHARE_FILE_RECEIVE_DATA,
                 bytesReceived,
                 downloadProgress,
-                shareFileData
+                downloadSpeed: (bytesReceived * 1000 / ((Date.now() - downloadStartTime) * 1024 * 1024)).toFixed(2)
             });
+
+            if (downloadStream && downloadWriter) {
+                downloadWriter.write(new Uint8Array(fileData))
+                if (bytesReceived === shareFileMetadata.fileSize) {
+                    downloadWriter.close();
+                    downloadStream = undefined;
+                    downloadWriter = undefined;
+                }
+            }
         }
+    } catch (err) {
+        console.log(err);
     }
 }
 
@@ -514,25 +548,14 @@ export function rejectShareFile(senderId) {
     }
 }
 
-function startFileSharing(recipientId) {
-    appStore.dispatch({ type: START_SHARE_FILE, otherUser: recipientId });
-}
-
-export function endFileSharing(recipientId) {
-    appStore.dispatch({ type: END_SHARE_FILE });
-}
-
-export function leaveFileSharing(recipientId) {
-    newSocket && newSocket.emit('leave-file-sharing', { recipientId });
-}
-
 const BYTES_PER_CHUNK = 16000;
+let fileReader;
 export async function sendFile(recipientId, file) {
     let currentChunk = 0;
-    let fileReader = new FileReader();
+    fileReader = new FileReader();
     const fileSize = file.size;
     const fileName = file.name;
-    let bytesSent = 0, uploadProgress = 0;
+    let bytesSent = 0, uploadProgress = 0, uploadStartTime = Date.now();
 
     const { dataChannel } = dataChannelPeerConnections[recipientId] || {};
     if (dataChannel && dataChannel.readyState === 'open') {
@@ -548,19 +571,25 @@ export async function sendFile(recipientId, file) {
             fileReader.readAsArrayBuffer(file.slice(start, end));
         }
     
-        fileReader.onload = function() {
+        fileReader.onload = async function() {
             // we are reading the file as array buffer, it cannot be directly sent as stringified json
             // need to be decoded/encoded. This is not reliable for all kinds of files
             // so we will directly send the array buffer chunks
-            dataChannel.send(fileReader.result);
+            dataChannel.send(JSON.stringify({
+                type: "file-data",
+                // array buffer cannot be transmitted as a stringified json
+                // so encode it as a string and transmit
+                fileData: arrBuffToStr(fileReader.result)
+            }));
 
             // ******update the store so that the sender can update the UI accordingly
             bytesSent += fileReader.result.byteLength;
-            uploadProgress = bytesSent * 100 / fileSize;
+            uploadProgress = (bytesSent * 100 / fileSize).toFixed(2);
             appStore.dispatch({
                 type: SHARE_FILE_SEND_DATA,
                 bytesSent,
-                uploadProgress
+                uploadProgress,
+                uploadSpeed: (bytesSent * 1000 / ((Date.now() - uploadStartTime) * 1024 * 1024)).toFixed(2)
             });
             // ********
 
@@ -571,13 +600,27 @@ export async function sendFile(recipientId, file) {
             }
         };
 
-        await delay(1000);
-
         readNextChunk();
     }
 }
 
-export function endFileDownload(otherUser) {
-    leaveFileSharing(otherUser);
+function startFileSharing(recipientId) {
+    appStore.dispatch({ type: START_SHARE_FILE, otherUser: recipientId });
+}
+
+export function endFileSharing(recipientId) {
     appStore.dispatch({ type: END_SHARE_FILE });
+    if (fileReader) {
+        fileReader.abort();
+        fileReader = undefined;
+    }
+    if (downloadWriter) {
+        downloadWriter.abort();
+        downloadWriter = undefined;
+        downloadStream = undefined;
+    }
+}
+
+export function leaveFileSharing(recipientId) {
+    newSocket && newSocket.emit('leave-file-sharing', { recipientId });
 }

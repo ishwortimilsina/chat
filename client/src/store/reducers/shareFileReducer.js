@@ -13,9 +13,11 @@ const initialState = {
     shareFileMetadata: {},
     downloadProgress: 0,
     bytesReceived: 0,
-    shareFileData: undefined,
+    downloadStartTime: undefined,
+    downloadSpeed: undefined,
     bytesSent: 0,
     uploadProgress: 0,
+    uploadSpeed: undefined,
     disconnected: false
 };
 
@@ -46,20 +48,21 @@ export function shareFileReducer(state = initialState, action) {
                 shareFileMetadata: { fileName: action.fileName, fileSize: action.fileSize },
                 bytesReceived: 0,
                 downloadProgress: 0,
-                shareFileData: []
+                downloadStartTime: action.downloadStartTime
             };
         case SHARE_FILE_RECEIVE_DATA:
             return {
                 ...state,
                 bytesReceived: action.bytesReceived,
                 downloadProgress: action.downloadProgress,
-                shareFileData: action.shareFileData
+                downloadSpeed: action.downloadSpeed
             };
         case SHARE_FILE_SEND_DATA:
             return {
                 ...state,
                 bytesSent: action.bytesSent,
-                uploadProgress: action.uploadProgress
+                uploadProgress: action.uploadProgress,
+                uploadSpeed: action.uploadSpeed
             };
         default:
             return state;

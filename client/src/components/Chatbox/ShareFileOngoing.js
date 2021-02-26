@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { endFileDownload, leaveFileSharing, sendFile } from "../../store/actions";
+import { leaveFileSharing, sendFile } from "../../store/actions";
 
 import EndCallIcon from "../common/icons/EndCallIcon";
 import FileUploadIcon from "../common/icons/FileUploadIcon";
@@ -24,26 +24,26 @@ export default function ShareFileOngoing({ endFileSharing, shareFile }) {
         <>
             <form className="share-file-form">
                 {
-                    shareFile.uploadProgress ? <progress max="100" value={shareFile.uploadProgress}>{shareFile.uploadProgress}</progress> : null
+                    shareFile.uploadProgress ? (
+                        <>
+                            <span>Upload speed: {shareFile.uploadSpeed} MB/s</span>
+                            <progress max="100" value={shareFile.uploadProgress}>
+                                {shareFile.uploadProgress}
+                            </progress>
+                            <span>{shareFile.uploadProgress}%</span>
+                        </>
+                    ) : null
                 }
                 {
                     shareFile.downloadProgress ? (
                         <>
+                            <span>Download speed: {shareFile.downloadSpeed} MB/s</span>
                             <progress max="100" value={shareFile.downloadProgress}>
                                 {shareFile.downloadProgress}
-                            </progress>{shareFile.downloadProgress}%
+                            </progress>
+                            <span>{shareFile.downloadProgress}%</span>
                         </>
                      ) : null
-                }
-                {
-                    shareFile.bytesReceived === shareFile.shareFileMetadata.fileSize
-                        ? <a
-                            className="download-file-button"
-                            href={URL.createObjectURL(new Blob(shareFile.shareFileData))}
-                            download={shareFile.shareFileMetadata.fileName}
-                            onClick={() => endFileDownload(shareFile.otherUser)}
-                        >Download File</a>
-                        : null
                 }
                 {
                     !shareFile.uploadProgress && ! shareFile.downloadProgress
