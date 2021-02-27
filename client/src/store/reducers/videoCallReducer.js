@@ -3,7 +3,7 @@ import {
     LOCAL_VIDEO_READY, REJECT_VIDEO_CALL, REMOTE_VIDEO_READY, 
     REMOVE_CONTACT, 
     REQUEST_VIDEO_CALL, START_VIDEO_CALL 
-} from "../actions";
+} from "../actions/actionTypes";
 
 const initialState = {
     ongoing: false,

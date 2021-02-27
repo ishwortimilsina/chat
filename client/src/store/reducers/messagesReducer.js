@@ -1,4 +1,4 @@
-import { RECEIVE_MESSAGE, SEND_MESSAGE } from "../actions";
+import { RECEIVE_MESSAGE, SEND_MESSAGE } from "../actions/actionTypes";
 
 const initialState = {};
 

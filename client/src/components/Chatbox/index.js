@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import { sendCallRequest, rejectAudioVideoCall, openFileSharingWidget } from '../../store/actions';
+import { sendCallRequest, openFileSharingWidget } from '../../store/actions';
 import ShareIcon from '../common/icons/ShareIcon';
 import VideoCallIcon from '../common/icons/VideoCallIcon';
 import VoiceCallIcon from '../common/icons/VoiceCallIcon';
@@ -73,4 +73,4 @@ const mapStateToProps = (state, ownProps) => ({
     selectedContactName: (state.contacts.filter(cont => cont.userId === ownProps.selectedContact)[0] || {}).userName
 });
 
-export default connect(mapStateToProps, { sendCallRequest, rejectAudioVideoCall, openFileSharingWidget })(Chatbox);
+export default connect(mapStateToProps, { sendCallRequest, openFileSharingWidget })(Chatbox);

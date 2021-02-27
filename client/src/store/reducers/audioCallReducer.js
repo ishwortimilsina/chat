@@ -3,7 +3,7 @@ import {
     LOCAL_AUDIO_READY, REJECT_AUDIO_CALL, REMOTE_AUDIO_READY,
     REMOVE_CONTACT,
     REQUEST_AUDIO_CALL, START_AUDIO_CALL
-} from "../actions";
+} from "../actions/actionTypes";
 
 const initialState = {
     ongoing: false,
