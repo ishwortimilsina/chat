@@ -143,6 +143,11 @@ export function initializeSocketForShareFile(currentSocket) {
             otherUser: data.accepterId
         });
     });
+
+    currentSocket.on('receive-share-file-leave', ({ leaverId }) => {
+        console.log(`Received a file-sharing leave message from ${leaverId}.`);
+        endFileSharing(leaverId);
+    });
 }
 
 export function openFileSharingWidget(recipientId) {
