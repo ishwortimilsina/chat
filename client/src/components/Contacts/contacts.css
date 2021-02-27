@@ -37,9 +37,9 @@
 .search-input {
     padding: 10px 20px;
     font-size: 0.8em;
-    border-radius: 15px;
+    border-radius: 8px;
     border: none;
     outline: none;
-    background-color: #76c8b8;
+    background-color: #bbe5dd;
     color: white;
 }

@@ -44,11 +44,11 @@ function handleChannelMessage(msg, sender) {
                 downloadStartTime: Date.now()
             });
 
-            createDownloadStream(data.fileName);
+            createDownloadStream(data.fileName, sender);
         } else if (data.type === "file-data" && data.fileData) {
-            processDownloadStream(data.fileData);
+            processDownloadStream(data.fileData, sender);
         } else if (data.type === 'file-share-negotiation') {
-            processFileShareNegotiation(data.msg);
+            processFileShareNegotiation(data.msg, sender);
         }
     } catch (err) {
         console.log(err);

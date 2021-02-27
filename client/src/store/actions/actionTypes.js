@@ -23,6 +23,7 @@ export const END_VIDEO_CALL = 'video:end-call';
 export const LOCAL_VIDEO_READY = 'video:local-stream-ready';
 export const REMOTE_VIDEO_READY = 'video:remote-stream-ready';
 
+export const OPEN_FILE_SHARE_WIDGET = 'share-file:open-widget';
 export const REQUEST_SHARE_FILE = 'share-file:request';
 export const INCOMING_SHARE_FILE_REQUEST = 'share-file:incoming';
 export const ACCEPT_SHARE_FILE_REQUEST = 'share-file:accept';

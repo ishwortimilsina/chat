@@ -1,7 +1,9 @@
 import { appStore } from '../..';
 import {
     ACCEPT_SHARE_FILE_REQUEST, END_SHARE_FILE, INCOMING_SHARE_FILE_REQUEST,
+    OPEN_FILE_SHARE_WIDGET,
     REJECT_SHARE_FILE_REQUEST, REQUEST_SHARE_FILE,
+    SHARE_FILE_METADATA,
     SHARE_FILE_RECEIVE_DATA, SHARE_FILE_SEND_DATA, START_SHARE_FILE
 } from './actionTypes';
 
@@ -9,7 +11,11 @@ import * as streamSaver from 'streamsaver';
 import { dataChannelPeerConnections } from './connections';
 
 const BYTES_PER_CHUNK = 16000;
-let fileReader, downloadStream, downloadWriter, newSocket;
+let fileReader = {}, downloadStream = {}, downloadWriter = {};
+const fileShareEvents = {
+    onrequestaccept: {},
+    onrequestreject: {}
+};
 
 /**
  * Converts an array buffer to string 
@@ -32,12 +38,27 @@ function strToArrBuff(str) {
     return buff;
 }
 
-export function createDownloadStream(fileName) {
-    downloadStream = streamSaver.createWriteStream(fileName);
-    downloadWriter = downloadStream.getWriter();
+function clearUserFileShareEvents(otherUserId, abortOrClose) {
+    fileShareEvents.onrequestaccept[otherUserId] = undefined;
+    fileShareEvents.onrequestreject[otherUserId] = undefined;
+
+    if (fileReader[otherUserId]) {
+        abortOrClose === "close" ? fileReader[otherUserId].close() : fileReader[otherUserId].abort();
+        fileReader[otherUserId] = undefined;
+    }
+    if (downloadWriter[otherUserId]) {
+        abortOrClose === "close" ? downloadWriter[otherUserId].close() : downloadWriter[otherUserId].abort();
+        downloadWriter[otherUserId] = undefined;
+        downloadStream[otherUserId] = undefined;
+    }
 }
 
-export function processDownloadStream(data) {
+export function createDownloadStream(fileName, otherUserId) {
+    downloadStream[otherUserId] = streamSaver.createWriteStream(fileName);
+    downloadWriter[otherUserId] = downloadStream[otherUserId].getWriter();
+}
+
+export function processDownloadStream(data, otherUserId) {
     // array buffer cannot be transmitted as a stringified json
     // so it's sent as encoded to string which we convert back here
     const fileData = strToArrBuff(data);
@@ -56,19 +77,17 @@ export function processDownloadStream(data) {
         downloadSpeed: (bytesReceived * 1000 / ((Date.now() - downloadStartTime) * 1024 * 1024)).toFixed(2)
     });
 
-    if (downloadStream && downloadWriter) {
-        downloadWriter.write(new Uint8Array(fileData))
+    if (downloadStream[otherUserId] && downloadWriter[otherUserId]) {
+        downloadWriter[otherUserId].write(new Uint8Array(fileData))
         if (bytesReceived === shareFileMetadata.fileSize) {
-            downloadWriter.close();
-            downloadStream = undefined;
-            downloadWriter = undefined;
+            clearUserFileShareEvents(otherUserId, "close");
         }
     }
 }
 
-export async function sendFile(recipientId, file) {
+async function sendFile(recipientId, file) {
     let currentChunk = 0;
-    fileReader = new FileReader();
+    fileReader[recipientId] = new FileReader();
     const fileSize = file.size;
     const fileName = file.name;
     let bytesSent = 0, uploadProgress = 0, uploadStartTime = Date.now();
@@ -80,23 +99,29 @@ export async function sendFile(recipientId, file) {
             fileName,
             fileSize
         }));
+        appStore.dispatch({
+            type: SHARE_FILE_METADATA,
+            otherUser: recipientId,
+            fileName: fileName,
+            fileSize: fileSize
+        });
 
         function readNextChunk() {
             const start = BYTES_PER_CHUNK * currentChunk;
             const end = Math.min(fileSize, start + BYTES_PER_CHUNK);
-            fileReader.readAsArrayBuffer(file.slice(start, end));
+            fileReader[recipientId].readAsArrayBuffer(file.slice(start, end));
         }
     
-        fileReader.onload = async function() {
+        fileReader[recipientId].onload = async function handleFileRead() {
             dataChannel.send(JSON.stringify({
                 type: "file-data",
                 // array buffer cannot be transmitted as a stringified json
                 // so encode it as a string and transmit
-                fileData: arrBuffToStr(fileReader.result)
+                fileData: arrBuffToStr(fileReader[recipientId].result)
             }));
 
             // ******update the store so that the sender can update the UI accordingly
-            bytesSent += fileReader.result.byteLength;
+            bytesSent += fileReader[recipientId].result.byteLength;
             uploadProgress = (bytesSent * 100 / fileSize).toFixed(2);
             appStore.dispatch({
                 type: SHARE_FILE_SEND_DATA,
@@ -130,12 +155,18 @@ export function processFileShareNegotiation(data) {
                 type: START_SHARE_FILE,
                 otherUser: data.accepterId
             });
+            if (fileShareEvents.onrequestaccept[data.accepterId]) {
+                fileShareEvents.onrequestaccept[data.accepterId]();
+            }
             break;
         case 'reject-share-file-request':
             appStore.dispatch({
                 type: END_SHARE_FILE,
                 otherUser: data.rejecterId
             });
+            if (fileShareEvents.onrequestreject[data.accepterId]) {
+                fileShareEvents.onrequestreject[data.accepterId]();
+            }
             break;
         case 'leave-file-sharing':
             endFileSharing(data.leaverId);
@@ -145,7 +176,16 @@ export function processFileShareNegotiation(data) {
     }
 }
 
-export function openFileSharingWidget(recipientId, senderId) {
+export function openFileSharingWidget(recipientId) {
+    return (dispatch) => {
+        dispatch({
+            type: OPEN_FILE_SHARE_WIDGET,
+            otherUser: recipientId
+        });
+    }
+}
+
+export function requestShareFile(recipientId, senderId, file) {
     return (dispatch) => {
         const { dataChannel } = dataChannelPeerConnections[recipientId] || {};
         if (dataChannel && dataChannel.readyState === 'open') {
@@ -160,6 +200,10 @@ export function openFileSharingWidget(recipientId, senderId) {
                 type: REQUEST_SHARE_FILE,
                 otherUser: recipientId
             });
+
+            fileShareEvents.onrequestaccept[recipientId] = function handleRequestAccept() {
+                sendFile(recipientId, file);
+            }
         }
     }
 }
@@ -202,17 +246,9 @@ export function rejectShareFile(recipientId, rejecterId) {
     }
 }
 
-export function endFileSharing() {
+export function endFileSharing(otherUserId) {
     appStore.dispatch({ type: END_SHARE_FILE });
-    if (fileReader) {
-        fileReader.abort();
-        fileReader = undefined;
-    }
-    if (downloadWriter) {
-        downloadWriter.abort();
-        downloadWriter = undefined;
-        downloadStream = undefined;
-    }
+    clearUserFileShareEvents(otherUserId, 'abort');
 }
 
 export function leaveFileSharing(recipientId, leaverId) {

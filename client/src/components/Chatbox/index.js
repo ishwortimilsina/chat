@@ -17,7 +17,7 @@ import VideoCallContainer from './VideoCallContainer';
 function Chatbox({ selectedContact, selectedContactName, selectContact, sendCallRequest, openFileSharingWidget, audioCall, videoCall, shareFile }) {
     const shouldShowAudioCallContainer = audioCall.ongoing || audioCall.callRequested || audioCall.acceptedRequest || audioCall.incomingRequest;
     const shouldShowVideoCallContainer = videoCall.ongoing || videoCall.callRequested || videoCall.acceptedRequest || videoCall.incomingRequest;
-    const shouldShowShareFileContainer = shareFile.ongoing || shareFile.shareRequested || shareFile.acceptedRequest || shareFile.incomingRequest;
+    const shouldShowShareFileContainer = shareFile.openFileSharingWidget || shareFile.ongoing || shareFile.shareRequested || shareFile.acceptedRequest || shareFile.incomingRequest;
     const showOtherUserDisconnected = audioCall.disconnected || videoCall.disconnected || shareFile.disconnected;
     const cred = useContext(AppContext);
 
@@ -41,7 +41,7 @@ function Chatbox({ selectedContact, selectedContactName, selectContact, sendCall
                     ) : <span>Select a contact to start chatting.</span>}
                 </div>
                 <div className={`${!selectedContact || shouldShowAudioCallContainer || shouldShowVideoCallContainer || shouldShowShareFileContainer ? ' disable' : ''}`}>
-                    <ShareIcon tooltip="Share File" className="chat-initiators" onClick={() => openFileSharingWidget(selectedContact, cred.userId)} />
+                    <ShareIcon tooltip="Share File" className="chat-initiators" onClick={() => openFileSharingWidget(selectedContact)} />
                     <VoiceCallIcon tooltip="Voice Call" className="chat-initiators" onClick={() => sendCallRequest(selectedContact, 'audio')} />
                     <VideoCallIcon tooltip="Video Call" className="chat-initiators" onClick={() => sendCallRequest(selectedContact, 'video')} />
                 </div>

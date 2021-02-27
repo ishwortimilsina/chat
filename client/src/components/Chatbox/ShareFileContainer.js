@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import { leaveFileSharing, endFileSharing, acceptShareFile, rejectShareFile } from '../../store/actions';
+import { leaveFileSharing, endFileSharing, acceptShareFile, rejectShareFile, requestShareFile } from '../../store/actions';
 import EndCallIcon from '../common/icons/EndCallIcon';
 import FileDownloadIcon from '../common/icons/FileDownloadIcon';
 import FileUploadIcon from '../common/icons/FileUploadIcon';
@@ -9,23 +9,24 @@ import ThumbUpIcon from '../common/icons/ThumbUpIcon';
 import CallNotifier from './CallNotifier';
 import ShareFileOngoing from './ShareFileOngoing';
 
-function ShareFileContainer({ shareFile, rejectShareFile, acceptShareFile, selectContact, currUserId }) {
+function ShareFileContainer({ shareFile, requestShareFile, rejectShareFile, acceptShareFile, selectContact, currUserId }) {
     return (
         <div className="share-file-container">
+            <CallNotifier>
             {
                 shareFile.shareRequested ? (
-                    <CallNotifier>
+                    <>
                         <FileUploadIcon className="outgoing-call" />
-                        Requesting <span style={{fontWeight: "bold"}}>{shareFile.otherUser}</span> to accept file.
+                        Requesting <span style={{fontWeight: "bold"}}>{shareFile.otherUser}</span> to accept the file.
                         <div className="end-call-button" onClick={() => {
                             endFileSharing();
                             leaveFileSharing(shareFile.otherUser, currUserId);
                         }}>
                             <EndCallIcon style={{ height: 30, width: 30 }} />
                         </div>
-                    </CallNotifier>
+                    </>
                 ) : shareFile.incomingRequest ? (
-                    <CallNotifier>
+                    <>
                         <FileDownloadIcon className="incoming-call" />
                         <span style={{fontWeight: "bold"}}>{shareFile.otherUser}</span> wants to share a file with you.
                         <div className="accept-reject-buttons-container">
@@ -47,13 +48,21 @@ function ShareFileContainer({ shareFile, rejectShareFile, acceptShareFile, selec
                                 <ThumbDownIcon style={{ height: 30, width: 30, color: 'red' }} />
                             </div>
                         </div>
-                    </CallNotifier>
-                ) : shareFile.acceptedRequest 
-                    ? <span>Connecting...</span>
-                    : <ShareFileOngoing currUserId={currUserId} endFileSharing={endFileSharing} shareFile={shareFile} />
+                    </>
+                ) : shareFile.acceptedRequest ? (
+                    <span>Connecting...</span>
+                ) : (
+                    <ShareFileOngoing
+                        currUserId={currUserId}
+                        requestShareFile={requestShareFile}
+                        endFileSharing={endFileSharing}
+                        shareFile={shareFile}
+                    />
+                )
             }
+            </CallNotifier>
         </div>
     );
 }
 
-export default connect(null, { acceptShareFile, rejectShareFile })(ShareFileContainer);
+export default connect(null, { requestShareFile, acceptShareFile, rejectShareFile })(ShareFileContainer);

@@ -1,11 +1,13 @@
 import {
     ACCEPT_SHARE_FILE_REQUEST, END_SHARE_FILE, INCOMING_SHARE_FILE_REQUEST,
+    OPEN_FILE_SHARE_WIDGET,
     REJECT_SHARE_FILE_REQUEST, REMOVE_CONTACT, REQUEST_SHARE_FILE, SHARE_FILE_METADATA, 
     SHARE_FILE_RECEIVE_DATA, SHARE_FILE_SEND_DATA, START_SHARE_FILE
 } from "../actions/actionTypes";
 
 const initialState = {
     ongoing: false,
+    openShareFileWidget: false,
     shareRequested: false,
     incomingRequest: false,
     acceptedRequest: false,
@@ -23,6 +25,8 @@ const initialState = {
 
 export function shareFileReducer(state = initialState, action) {
     switch (action.type) {
+        case OPEN_FILE_SHARE_WIDGET:
+            return { ...initialState, openFileSharingWidget: true, otherUser: action.otherUser };
         case REQUEST_SHARE_FILE:
             return { ...initialState, shareRequested: true, otherUser: action.otherUser };
         case INCOMING_SHARE_FILE_REQUEST:

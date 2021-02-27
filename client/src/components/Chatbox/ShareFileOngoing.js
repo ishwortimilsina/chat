@@ -1,12 +1,12 @@
 import { useState } from "react";
 
-import { leaveFileSharing, sendFile } from "../../store/actions";
+import { leaveFileSharing } from "../../store/actions";
 
 import EndCallIcon from "../common/icons/EndCallIcon";
 import FileUploadIcon from "../common/icons/FileUploadIcon";
 import SendMessageIcon from "../common/icons/SendMessageIcon";
 
-export default function ShareFileOngoing({ endFileSharing, shareFile, currUserId }) {
+export default function ShareFileOngoing({ requestShareFile, endFileSharing, shareFile, currUserId }) {
     const [filename, setFilename] = useState('');
     const [file, setFile] = useState(null);
 
@@ -17,7 +17,7 @@ export default function ShareFileOngoing({ endFileSharing, shareFile, currUserId
     }
 
     const handleFileSubmit = (event) => {
-        sendFile(shareFile.otherUser, file);
+        requestShareFile(shareFile.otherUser, currUserId, file);
     }
 
     return (
@@ -26,8 +26,12 @@ export default function ShareFileOngoing({ endFileSharing, shareFile, currUserId
                 {
                     shareFile.uploadProgress ? (
                         <>
+                            <span>Uploading</span>
+                            <span className="sharing-file-name" title={shareFile.shareFileMetadata.fileName}>
+                                {shareFile.shareFileMetadata.fileName}
+                            </span>
                             <span>Upload speed: {shareFile.uploadSpeed} MB/s</span>
-                            <progress max="100" value={shareFile.uploadProgress}>
+                            <progress className="upload-download-progressbar" max="100" value={shareFile.uploadProgress}>
                                 {shareFile.uploadProgress}
                             </progress>
                             <span>{shareFile.uploadProgress}%</span>
@@ -37,8 +41,12 @@ export default function ShareFileOngoing({ endFileSharing, shareFile, currUserId
                 {
                     shareFile.downloadProgress ? (
                         <>
+                            <span>Downloading</span>
+                            <span className="sharing-file-name" title={shareFile.shareFileMetadata.fileName}>
+                                {shareFile.shareFileMetadata.fileName}
+                            </span>
                             <span>Download speed: {shareFile.downloadSpeed} MB/s</span>
-                            <progress max="100" value={shareFile.downloadProgress}>
+                            <progress className="upload-download-progressbar" max="100" value={shareFile.downloadProgress}>
                                 {shareFile.downloadProgress}
                             </progress>
                             <span>{shareFile.downloadProgress}%</span>
@@ -56,7 +64,10 @@ export default function ShareFileOngoing({ endFileSharing, shareFile, currUserId
                                     <input id="share-file-file-upload" type="file" onChange={handleFileNameChange} />
                                     <span className="file-upload-filename">{filename && filename}</span>
                                 </div>
-                                <div type="submit" className="share-file-submit" onClick={handleFileSubmit}>
+                                <div
+                                    className={`share-file-submit${!filename ? ' disable' : ''}`}
+                                    onClick={handleFileSubmit}
+                                >
                                     Send&nbsp;<SendMessageIcon style={{ height: 20 }} />
                                 </div>
                             </>
