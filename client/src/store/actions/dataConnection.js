@@ -2,7 +2,7 @@ import { appStore } from '../..';
 import { createPeerConnection } from './peerConnection';
 import { dataChannelPeerConnections } from './connections';
 import { RECEIVE_MESSAGE, SEND_MESSAGE, SHARE_FILE_METADATA } from './actionTypes';
-import { createDownloadStream, processDownloadStream } from './shareFile';
+import { createDownloadStream, processDownloadStream, processFileShareNegotiation } from './shareFile';
 
 export function sendMessage({ recipient, text, sender }) {
     return async (dispatch) => {
@@ -47,6 +47,8 @@ function handleChannelMessage(msg, sender) {
             createDownloadStream(data.fileName);
         } else if (data.type === "file-data" && data.fileData) {
             processDownloadStream(data.fileData);
+        } else if (data.type === 'file-share-negotiation') {
+            processFileShareNegotiation(data.msg);
         }
     } catch (err) {
         console.log(err);

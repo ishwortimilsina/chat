@@ -9,7 +9,7 @@ import ThumbUpIcon from '../common/icons/ThumbUpIcon';
 import CallNotifier from './CallNotifier';
 import ShareFileOngoing from './ShareFileOngoing';
 
-function ShareFileContainer({ shareFile, rejectShareFile, acceptShareFile, selectContact }) {
+function ShareFileContainer({ shareFile, rejectShareFile, acceptShareFile, selectContact, currUserId }) {
     return (
         <div className="share-file-container">
             {
@@ -18,8 +18,8 @@ function ShareFileContainer({ shareFile, rejectShareFile, acceptShareFile, selec
                         <FileUploadIcon className="outgoing-call" />
                         Requesting <span style={{fontWeight: "bold"}}>{shareFile.otherUser}</span> to accept file.
                         <div className="end-call-button" onClick={() => {
-                            endFileSharing(shareFile.otherUser);
-                            leaveFileSharing(shareFile.otherUser);
+                            endFileSharing();
+                            leaveFileSharing(shareFile.otherUser, currUserId);
                         }}>
                             <EndCallIcon style={{ height: 30, width: 30 }} />
                         </div>
@@ -32,7 +32,7 @@ function ShareFileContainer({ shareFile, rejectShareFile, acceptShareFile, selec
                             <div 
                                 className="accept-call-button"
                                 onClick={() => {
-                                    acceptShareFile(shareFile.otherUser);
+                                    acceptShareFile(shareFile.otherUser, currUserId);
                                     selectContact(shareFile.otherUser);
                                 }}
                                 title="Accept Request"
@@ -41,7 +41,7 @@ function ShareFileContainer({ shareFile, rejectShareFile, acceptShareFile, selec
                             </div>
                             <div
                                 className="end-call-button"
-                                onClick={() => rejectShareFile(shareFile.otherUser)}
+                                onClick={() => rejectShareFile(shareFile.otherUser, currUserId)}
                                 title="Reject Request"
                             >
                                 <ThumbDownIcon style={{ height: 30, width: 30, color: 'red' }} />
@@ -50,7 +50,7 @@ function ShareFileContainer({ shareFile, rejectShareFile, acceptShareFile, selec
                     </CallNotifier>
                 ) : shareFile.acceptedRequest 
                     ? <span>Connecting...</span>
-                    : <ShareFileOngoing endFileSharing={endFileSharing} shareFile={shareFile} />
+                    : <ShareFileOngoing currUserId={currUserId} endFileSharing={endFileSharing} shareFile={shareFile} />
             }
         </div>
     );

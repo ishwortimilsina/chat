@@ -6,7 +6,7 @@ import EndCallIcon from "../common/icons/EndCallIcon";
 import FileUploadIcon from "../common/icons/FileUploadIcon";
 import SendMessageIcon from "../common/icons/SendMessageIcon";
 
-export default function ShareFileOngoing({ endFileSharing, shareFile }) {
+export default function ShareFileOngoing({ endFileSharing, shareFile, currUserId }) {
     const [filename, setFilename] = useState('');
     const [file, setFile] = useState(null);
 
@@ -66,8 +66,8 @@ export default function ShareFileOngoing({ endFileSharing, shareFile }) {
             <div
                 className="end-call-button"
                 onClick={() => {
-                    endFileSharing(shareFile.otherUser);
-                    leaveFileSharing(shareFile.otherUser);
+                    endFileSharing();
+                    leaveFileSharing(shareFile.otherUser, currUserId);
                 }}
                 title="End Call"
             >

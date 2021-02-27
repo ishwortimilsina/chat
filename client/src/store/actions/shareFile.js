@@ -88,9 +88,6 @@ export async function sendFile(recipientId, file) {
         }
     
         fileReader.onload = async function() {
-            // we are reading the file as array buffer, it cannot be directly sent as stringified json
-            // need to be decoded/encoded. This is not reliable for all kinds of files
-            // so we will directly send the array buffer chunks
             dataChannel.send(JSON.stringify({
                 type: "file-data",
                 // array buffer cannot be transmitted as a stringified json
@@ -120,40 +117,45 @@ export async function sendFile(recipientId, file) {
     }
 }
 
-export function initializeSocketForShareFile(currentSocket) {
-    newSocket = currentSocket;
-
-    currentSocket.on('receive-share-file-request', data => {
-        appStore.dispatch({
-            type: INCOMING_SHARE_FILE_REQUEST,
-            otherUser: data.senderId
-        });
-    });
-
-    currentSocket.on('receive-share-file-reject', data => {
-        appStore.dispatch({
-            type: END_SHARE_FILE,
-            otherUser: data.rejecterId
-        });
-    });
-
-    currentSocket.on('receive-share-file-accept', data => {
-        appStore.dispatch({
-            type: START_SHARE_FILE,
-            otherUser: data.accepterId
-        });
-    });
-
-    currentSocket.on('receive-share-file-leave', ({ leaverId }) => {
-        console.log(`Received a file-sharing leave message from ${leaverId}.`);
-        endFileSharing(leaverId);
-    });
+export function processFileShareNegotiation(data) {
+    switch (data.type) {
+        case 'request-share-file':
+            appStore.dispatch({
+                type: INCOMING_SHARE_FILE_REQUEST,
+                otherUser: data.senderId
+            });
+            break;
+        case 'accept-share-file-request':
+            appStore.dispatch({
+                type: START_SHARE_FILE,
+                otherUser: data.accepterId
+            });
+            break;
+        case 'reject-share-file-request':
+            appStore.dispatch({
+                type: END_SHARE_FILE,
+                otherUser: data.rejecterId
+            });
+            break;
+        case 'leave-file-sharing':
+            endFileSharing(data.leaverId);
+            break;
+        default:
+            break;
+    }
 }
 
-export function openFileSharingWidget(recipientId) {
+export function openFileSharingWidget(recipientId, senderId) {
     return (dispatch) => {
-        if (newSocket) {
-            newSocket.emit('request-share-file', { recipientId });
+        const { dataChannel } = dataChannelPeerConnections[recipientId] || {};
+        if (dataChannel && dataChannel.readyState === 'open') {
+            dataChannel.send(JSON.stringify({
+                type: 'file-share-negotiation',
+                msg: {
+                    type: 'request-share-file',
+                    senderId
+                }
+            }));
             dispatch({
                 type: REQUEST_SHARE_FILE,
                 otherUser: recipientId
@@ -162,31 +164,45 @@ export function openFileSharingWidget(recipientId) {
     }
 }
 
-export function acceptShareFile(senderId) {
+export function acceptShareFile(recipientId, accepterId) {
     return (dispatch) => {
-        if (newSocket) {
-            newSocket.emit('accept-share-file-request', { senderId });
+        const { dataChannel } = dataChannelPeerConnections[recipientId] || {};
+        if (dataChannel && dataChannel.readyState === 'open') {
+            dataChannel.send(JSON.stringify({
+                type: 'file-share-negotiation',
+                msg: {
+                    type: 'accept-share-file-request',
+                    accepterId
+                }
+            }));
             dispatch({
                 type: ACCEPT_SHARE_FILE_REQUEST,
-                otherUser: senderId
+                otherUser: recipientId
             });
         }
     }
 }
 
-export function rejectShareFile(senderId) {
+export function rejectShareFile(recipientId, rejecterId) {
     return async (dispatch) => {
-        if (newSocket) {
-            await newSocket.emit('reject-share-file-request', { senderId });
+        const { dataChannel } = dataChannelPeerConnections[recipientId] || {};
+        if (dataChannel && dataChannel.readyState === 'open') {
+            dataChannel.send(JSON.stringify({
+                type: 'file-share-negotiation',
+                msg: {
+                    type: 'reject-share-file-request',
+                    rejecterId
+                }
+            }));
             dispatch({
                 type: REJECT_SHARE_FILE_REQUEST,
-                otherUser: senderId
+                otherUser: recipientId
             });
         }
     }
 }
 
-export function endFileSharing(recipientId) {
+export function endFileSharing() {
     appStore.dispatch({ type: END_SHARE_FILE });
     if (fileReader) {
         fileReader.abort();
@@ -199,6 +215,15 @@ export function endFileSharing(recipientId) {
     }
 }
 
-export function leaveFileSharing(recipientId) {
-    newSocket && newSocket.emit('leave-file-sharing', { recipientId });
+export function leaveFileSharing(recipientId, leaverId) {
+    const { dataChannel } = dataChannelPeerConnections[recipientId] || {};
+    if (dataChannel && dataChannel.readyState === 'open') {
+        dataChannel.send(JSON.stringify({
+            type: 'file-share-negotiation',
+            msg: {
+                type: 'leave-file-sharing',
+                leaverId
+            }
+        }));
+    }
 }

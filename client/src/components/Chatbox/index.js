@@ -1,4 +1,6 @@
+import { useContext } from 'react';
 import { connect } from 'react-redux';
+import { AppContext } from '../../contexts/AppContext';
 
 import { sendCallRequest, openFileSharingWidget } from '../../store/actions';
 import ShareIcon from '../common/icons/ShareIcon';
@@ -17,6 +19,7 @@ function Chatbox({ selectedContact, selectedContactName, selectContact, sendCall
     const shouldShowVideoCallContainer = videoCall.ongoing || videoCall.callRequested || videoCall.acceptedRequest || videoCall.incomingRequest;
     const shouldShowShareFileContainer = shareFile.ongoing || shareFile.shareRequested || shareFile.acceptedRequest || shareFile.incomingRequest;
     const showOtherUserDisconnected = audioCall.disconnected || videoCall.disconnected || shareFile.disconnected;
+    const cred = useContext(AppContext);
 
     return (
         <section className="chatbox">
@@ -38,7 +41,7 @@ function Chatbox({ selectedContact, selectedContactName, selectContact, sendCall
                     ) : <span>Select a contact to start chatting.</span>}
                 </div>
                 <div className={`${!selectedContact || shouldShowAudioCallContainer || shouldShowVideoCallContainer || shouldShowShareFileContainer ? ' disable' : ''}`}>
-                    <ShareIcon tooltip="Share File" className="chat-initiators" onClick={() => openFileSharingWidget(selectedContact)} />
+                    <ShareIcon tooltip="Share File" className="chat-initiators" onClick={() => openFileSharingWidget(selectedContact, cred.userId)} />
                     <VoiceCallIcon tooltip="Voice Call" className="chat-initiators" onClick={() => sendCallRequest(selectedContact, 'audio')} />
                     <VideoCallIcon tooltip="Video Call" className="chat-initiators" onClick={() => sendCallRequest(selectedContact, 'video')} />
                 </div>
@@ -50,7 +53,7 @@ function Chatbox({ selectedContact, selectedContactName, selectContact, sendCall
                         : shouldShowVideoCallContainer
                             ? <VideoCallContainer videoCall={videoCall} selectContact={selectContact} />
                             : shouldShowShareFileContainer 
-                                ? <ShareFileContainer shareFile={shareFile} selectContact={selectContact} />
+                                ? <ShareFileContainer currUserId={cred.userId} shareFile={shareFile} selectContact={selectContact} />
                                 : <OtherUserDisconnected
                                     otherUser={audioCall.disconnected ? audioCall.otherUser : videoCall.otherUser}
                                     type={audioCall.disconnected ? 'audio' : 'video'}
