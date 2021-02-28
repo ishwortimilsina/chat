@@ -39,7 +39,6 @@ export function establishConnection(id, name) {
 
             initializeSocketForPeerConnection(newSocket);
             initializeSocketForDataConnection(newSocket);
-            initializeSocketForAudioVideoCall(newSocket);
 
         } catch (ex) {
             console.log(ex);

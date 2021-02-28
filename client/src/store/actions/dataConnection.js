@@ -1,13 +1,14 @@
 import { appStore } from '../..';
 import { createPeerConnection } from './peerConnection';
-import { dataChannelPeerConnections } from './connections';
+import { peerConnections } from './connections';
 import { RECEIVE_MESSAGE, SEND_MESSAGE, SHARE_FILE_METADATA } from './actionTypes';
 import { createDownloadStream, processDownloadStream, processFileShareNegotiation } from './shareFile';
+import { processAudioVideoNegotiation } from './audioVideoCall';
 
 export function sendMessage({ recipient, text, sender }) {
     return async (dispatch) => {
         try {
-            const { dataChannel } = dataChannelPeerConnections[recipient] || {};
+            const { dataChannel } = peerConnections[recipient] || {};
             if (dataChannel && dataChannel.readyState === 'open') {
                 dataChannel.send(JSON.stringify({ type: "text-message", text }));
                 dispatch({
@@ -49,6 +50,8 @@ function handleChannelMessage(msg, sender) {
             processDownloadStream(data.fileData, sender);
         } else if (data.type === 'file-share-negotiation') {
             processFileShareNegotiation(data.msg, sender);
+        } else if (data.type === "audio-video-negotiation") {
+            processAudioVideoNegotiation(data.msg, sender);
         }
     } catch (err) {
         console.log(err);
@@ -59,9 +62,9 @@ function setupDataConnection(recipientId) {
     createPeerConnection(recipientId, "datachannel");
 
     // create a dataChannel and handle the channel events
-    const { peerConnection } = dataChannelPeerConnections[recipientId];
+    const { peerConnection } = peerConnections[recipientId];
     const dataChannel = peerConnection.createDataChannel('text-channel', { reliable: true });
-    dataChannelPeerConnections[recipientId].dataChannel = dataChannel;
+    peerConnections[recipientId].dataChannel = dataChannel;
 
     dataChannel.onopen = (event) => console.log('Data channel is ready.');
     dataChannel.onerror = (error) => console.log(error);
@@ -81,10 +84,10 @@ export function initializeSocketForDataConnection(newSocket) {
             console.log(`A ${type} offer received from ${offererId}`);
 
             createPeerConnection(offererId, type);
-            const { peerConnection } = dataChannelPeerConnections[offererId];
+            const { peerConnection } = peerConnections[offererId];
             peerConnection.ondatachannel = function handleOnDataChannel(event) {
-                dataChannelPeerConnections[offererId].dataChannel = event.channel;
-                dataChannelPeerConnections[offererId].dataChannel.onmessage = (msg) => handleChannelMessage(msg, offererId);
+                peerConnections[offererId].dataChannel = event.channel;
+                peerConnections[offererId].dataChannel.onmessage = (msg) => handleChannelMessage(msg, offererId);
             }
 
             // take the SDP (session description protocol) offer and create a new 
@@ -115,7 +118,7 @@ export function initializeSocketForDataConnection(newSocket) {
     newSocket.on('receive-answer', ({ answererId, answer, type }) => {
         if (type === 'datachannel') {
             console.log(`Received an answer from ${answererId} to the ${type} offer made.`);
-            const { peerConnection } = dataChannelPeerConnections[answererId] || {};
+            const { peerConnection } = peerConnections[answererId] || {};
             if (peerConnection && peerConnection.localDescription) {
                 peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
                     .catch(error => console.log(error));
@@ -128,7 +131,7 @@ export function initializeSocketForDataConnection(newSocket) {
     newSocket.on('receive-candidate', ({ senderId, candidate, type }) => {
         if (type === 'datachannel') {
             console.log(`Received an ICE candidate from ${senderId} for ${type}.`);
-            const { peerConnection } = dataChannelPeerConnections[senderId] || {};
+            const { peerConnection } = peerConnections[senderId] || {};
             // deliver the candidate to the local ICE layer
             if (peerConnection && peerConnection.localDescription) {
                 peerConnection.addIceCandidate(new RTCIceCandidate(candidate))

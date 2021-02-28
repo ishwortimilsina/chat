@@ -84,58 +84,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('request-call', (data) => {
-        console.log(`${userId} has made a call request to ${data.recipientId}`);
-
-        if (io.sockets.adapter.rooms.get(data.recipientId)) {
-            socket.to(data.recipientId).emit('receive-call-request', {
-                senderId: userId,
-                type: data.type
-            });
-        } else {
-            console.log(`User id ${data.recipientId} is not connected.`);
-        }
-    });
-
-    socket.on('accept-call', (data) => {
-        console.log(`${userId} has accepted a call request from ${data.senderId}`);
-
-        if (io.sockets.adapter.rooms.get(data.senderId)) {
-            socket.to(data.senderId).emit('receive-call-accept', {
-                accepterId: userId,
-                type: data.type
-            });
-        } else {
-            console.log(`User id ${data.senderId} is not connected.`);
-        }
-    });
-
-    socket.on('reject-call', (data) => {
-        console.log(`${userId} has rejected a call request from ${data.senderId}`);
-
-        if (io.sockets.adapter.rooms.get(data.senderId)) {
-            socket.to(data.senderId).emit('receive-call-reject', {
-                rejecterId: userId,
-                type: data.type
-            });
-        } else {
-            console.log(`User id ${data.senderId} is not connected.`);
-        }
-    });
-
-    socket.on('leave-chat', (data) => {
-        console.log(`${userId} leaving the ${data.type} chat with ${data.recipientId}.`);
-
-        if (io.sockets.adapter.rooms.get(data.recipientId)) {
-            socket.to(data.recipientId).emit('receive-leave', {
-                leaverId: userId,
-                type: data.type
-            });
-        } else {
-            console.log(`User ${data.recipientId} is not connected.`);
-        }
-    });
-
     socket.on('disconnect', () => {
         console.log(`Client ${userId} with socket id ${socket.id} disconnected.`);
         sendThisContactActivenessToAllOtherClients(false);

@@ -1,124 +1,120 @@
 import { appStore } from '../..';
+import { delay } from '../../utils/utils';
 
 import {
-    ACCEPT_AUDIO_CALL, ACCEPT_VIDEO_CALL, REQUEST_VIDEO_CALL,
+    ACCEPT_AUDIO_CALL, ACCEPT_VIDEO_CALL, REQUEST_VIDEO_CALL, REJECT_AUDIO_CALL,
     END_AUDIO_CALL, REJECT_VIDEO_CALL, REQUEST_AUDIO_CALL, INCOMING_AUDIO_CALL,
-    END_VIDEO_CALL, START_AUDIO_CALL, START_VIDEO_CALL, INCOMING_VIDEO_CALL,
-    LOCAL_AUDIO_READY, LOCAL_VIDEO_READY, REJECT_AUDIO_CALL
+    END_VIDEO_CALL, START_AUDIO_CALL, START_VIDEO_CALL, INCOMING_VIDEO_CALL, LOCAL_AUDIO_READY, LOCAL_VIDEO_READY
 } from "./actionTypes";
-import { closePeerConnection, createPeerConnection } from './peerConnection';
-import { audioVideoPeerConnections } from './connections';
+import { peerConnections } from './connections';
+import { createPeerConnection } from './peerConnection';
 
-let currentSocket;
+export function processAudioVideoNegotiation(data, otherUserId) {
+    switch (data.msgType) {
+        case 'request-call':
+            appStore.dispatch({
+                type: data.callType === 'audio' ? INCOMING_AUDIO_CALL : INCOMING_VIDEO_CALL,
+                otherUser: otherUserId
+            });
+            break;
+        case 'accept-call':
+            data.callType === 'audio' ? audioCallUser(otherUserId) : videoCallUser(otherUserId);
+            break;
+        case 'reject-call':
+            appStore.dispatch({
+                type: data.callType === 'audio' ? END_AUDIO_CALL : END_VIDEO_CALL,
+                otherUser: otherUserId
+            });
+            break;
+        case 'leave-chat':
+            if (data.callType === 'audio' || data.callType === 'video') {
+                endAudioVideoCall(otherUserId, data.callType);
+            }
+            break;
+        case 'send-offer':
+            handleOffer(data.offer, data.callType, otherUserId);
+            break;
+        case 'answer-offer':
+            handleAnswer(data.answer, data.callType, otherUserId);
+            break;
+        case 'send-candidate':
+            handleCandidate(data.candidate, data.callType, otherUserId);
+            break;
+        default:
+            break;
+    }
+}
 
-export function initializeSocketForAudioVideoCall(newSocket) {
-    currentSocket = newSocket;
+function handleAnswer( answer, type, answererId) {
+    console.log(`Received an answer from ${answererId} to the ${type} offer made.`);
+    const { peerConnection } = peerConnections[answererId] || {};
+    if (peerConnection && peerConnection.localDescription) {
+        peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
+            .catch(error => console.log(error));
+    }
+}
 
-    newSocket.on('receive-call-request', data => {
-        appStore.dispatch({
-            type: data.type === 'audio' ? INCOMING_AUDIO_CALL : INCOMING_VIDEO_CALL,
-            otherUser: data.senderId
-        });
+async function handleCandidate(candidate, type, senderId) {
+    console.log(`Received an ICE candidate from ${senderId} for ${type}.`);
+    const { peerConnection } = peerConnections[senderId] || {};
+    // deliver the candidate to the local ICE layer
+    await delay(100);
+    if (peerConnection && peerConnection.localDescription) {
+        peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+            .catch(error => console.log(error));
+    }
+}
+
+async function handleOffer(offer, type, offererId) {
+    console.log(`A ${type} offer received from ${offererId}`);
+
+    createPeerConnection(offererId, type);
+
+    const { peerConnection } = peerConnections[offererId];
+
+    appStore.dispatch({
+        type: type === 'audio' ? START_AUDIO_CALL : START_VIDEO_CALL,
+        otherUser: offererId
     });
 
-    newSocket.on('receive-call-accept', data => {
-        data.type === 'audio' ? audioCallUser(data.accepterId) : videoCallUser(data.accepterId);
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: type !== 'audio',
+        audio: true
     });
 
-    newSocket.on('receive-call-reject', data => {
-        appStore.dispatch({
-            type: data.type === 'audio' ? END_AUDIO_CALL : END_VIDEO_CALL,
-            otherUser: data.rejecterId
-        });
-    });
+    peerConnections[offererId][type === 'audio' ? 'localAudioStream' : 'localVideoStream'] = stream;
+    appStore.dispatch({ type: type === 'audio' ? LOCAL_AUDIO_READY : LOCAL_VIDEO_READY });
 
-    // ********************************************************************************
-    // When this user recieves an offer, create an answer and reply to the offerer
-    newSocket.on('receive-offer', async ({ offererId, offer, type }) => {
-        if (type !== 'datachannel') {
-            console.log(`A ${type} offer received from ${offererId}`);
+    // take the SDP (session description protocol) offer and create a new 
+    // RTCSessionDescription object representing the offerer's session description.
+    const sessDesc = new RTCSessionDescription(offer);
 
-            createPeerConnection(offererId, type);
-            const { peerConnection } = audioVideoPeerConnections[offererId];
-
-                appStore.dispatch({
-                    type: type === 'audio' ? START_AUDIO_CALL : START_VIDEO_CALL,
-                    otherUser: offererId
-                });
-
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: type !== 'audio',
-                    audio: true
-                });
-
-                audioVideoPeerConnections[offererId][type === 'audio' ? 'localAudioStream' : 'localVideoStream'] = stream;
-                appStore.dispatch({ type: type === 'audio' ? LOCAL_AUDIO_READY : LOCAL_VIDEO_READY });
-
-            // take the SDP (session description protocol) offer and create a new 
-            // RTCSessionDescription object representing the offerer's session description.
-            const sessDesc = new RTCSessionDescription(offer);
-
-            // use the session description to now establish the received offer as the 
-            // description of the remote (caller/offerer's) end of the connection
-            peerConnection.setRemoteDescription(sessDesc)
-                .then(() => {
-                    const stream = audioVideoPeerConnections[offererId][type === 'audio' ? 'localAudioStream' : 'localVideoStream'];
-                    stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
-                })
-                // the description of the local end of the connection is set to the answer's
-                // SDP, and then send the answer to the remote through the server
-                .then(() => peerConnection.createAnswer())
-                .then((answer) => peerConnection.setLocalDescription(answer))
-                .then(() => {
-                    console.log(`Sending the answer to the offer made by ${offererId}`);
-                    newSocket.emit('answer-offer', {
-                        offererId,
+    // use the session description to now establish the received offer as the 
+    // description of the remote (caller/offerer's) end of the connection
+    peerConnection.setRemoteDescription(sessDesc)
+        .then(() => {
+            const stream = peerConnections[offererId][type === 'audio' ? 'localAudioStream' : 'localVideoStream'];
+            stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
+        })
+        // the description of the local end of the connection is set to the answer's
+        // SDP, and then send the answer to the remote through the server
+        .then(() => peerConnection.createAnswer())
+        .then((answer) => peerConnection.setLocalDescription(answer))
+        .then(() => {
+            console.log(`Sending the answer to the offer made by ${offererId}`);
+            const { dataChannel } = peerConnections[offererId] || {};
+            if (dataChannel && dataChannel.readyState === 'open') {
+                dataChannel.send(JSON.stringify({
+                    type: 'audio-video-negotiation',
+                    msg: {
+                        msgType: 'answer-offer',
                         answer: peerConnection.localDescription,
-                        type
-                    });
-                })
-                .catch((error) => console.log(error));
-        }
-    });
-
-    // ********************************************************************************
-    // when this user receives an answer to the offer made
-    newSocket.on('receive-answer', ({ answererId, answer, type }) => {
-        if (type !== 'datachannel') {
-            console.log(`Received an answer from ${answererId} to the ${type} offer made.`);
-            const { peerConnection } = audioVideoPeerConnections[answererId] || {};
-            if (peerConnection && peerConnection.localDescription) {
-                peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
-                    .catch(error => console.log(error));
+                        callType: type
+                    }
+                }));
             }
-        }
-    });
-
-    // ********************************************************************************
-    // when this user receives an ICE candidate
-    newSocket.on('receive-candidate', ({ senderId, candidate, type }) => {
-        if (type !== 'datachannel') {
-            console.log(`Received an ICE candidate from ${senderId} for ${type}.`);
-            const { peerConnection } = audioVideoPeerConnections[senderId] || {};
-            // deliver the candidate to the local ICE layer
-            if (peerConnection && peerConnection.localDescription) {
-                peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
-                    .catch(error => console.log(error));
-            }
-        }
-    });
-
-    // ********************************************************************************
-    // when this user receives a leave message
-    newSocket.on('receive-leave', ({ leaverId, type }) => {
-        if (type !== 'datachannel') {
-            console.log(`Received a leave message from ${leaverId} for ${type}.`);
-            if (type === 'audio' || type === 'video') {
-                endAudioVideoCall(leaverId, type);
-            }
-            closePeerConnection(leaverId, type);
-        }
-    });
+        })
+        .catch((error) => console.log(error));
 }
 
 export async function videoCallUser(recipientId) {
@@ -128,12 +124,11 @@ export async function videoCallUser(recipientId) {
 
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
-        createPeerConnection(recipientId, "video");
-
-        const { peerConnection } = audioVideoPeerConnections[recipientId];
+        createPeerConnection(recipientId, 'video');
+        const { peerConnection } = peerConnections[recipientId];
         stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
 
-        audioVideoPeerConnections[recipientId].localVideoStream = stream;
+        peerConnections[recipientId].localVideoStream = stream;
         appStore.dispatch({ type: LOCAL_VIDEO_READY });
     } catch (err) {
         console.log(err);
@@ -147,12 +142,11 @@ export async function audioCallUser(recipientId) {
 
         const stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
 
-        createPeerConnection(recipientId, "audio");
-
-        const { peerConnection } = audioVideoPeerConnections[recipientId];
+        createPeerConnection(recipientId, 'audio');
+        const { peerConnection } = peerConnections[recipientId];
         stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
 
-        audioVideoPeerConnections[recipientId].localAudioStream = stream;
+        peerConnections[recipientId].localAudioStream = stream;
         appStore.dispatch({ type: LOCAL_AUDIO_READY });
     } catch (err) {
         console.log(err);
@@ -161,34 +155,55 @@ export async function audioCallUser(recipientId) {
 
 export function sendCallRequest(recipientId, callType) {
     return (dispatch) => {
-        if (currentSocket) {
-            currentSocket.emit('request-call', { recipientId, type: callType });
+        const { dataChannel } = peerConnections[recipientId] || {};
+        if (dataChannel && dataChannel.readyState === 'open') {
+            dataChannel.send(JSON.stringify({
+                type: 'audio-video-negotiation',
+                msg: {
+                    msgType: 'request-call',
+                    callType
+                }
+            }));
             dispatch({
                 type: callType === 'audio' ? REQUEST_AUDIO_CALL : REQUEST_VIDEO_CALL,
                 otherUser: recipientId
             });
-        }
+        }     
     }
 }
 
-export function acceptAudioVideoCall(senderId, type) {
+export function acceptAudioVideoCall(senderId, callType) {
     return (dispatch) => {
-        if (currentSocket) {
-            currentSocket.emit('accept-call', { senderId, type });
+        const { dataChannel } = peerConnections[senderId] || {};
+        if (dataChannel && dataChannel.readyState === 'open') {
+            dataChannel.send(JSON.stringify({
+                type: 'audio-video-negotiation',
+                msg: {
+                    msgType: 'accept-call',
+                    callType
+                }
+            }));
             dispatch({
-                type: type === 'audio' ? ACCEPT_AUDIO_CALL : ACCEPT_VIDEO_CALL,
+                type: callType === 'audio' ? ACCEPT_AUDIO_CALL : ACCEPT_VIDEO_CALL,
                 otherUser: senderId
             });
         }
     }
 }
 
-export function rejectAudioVideoCall(senderId, type) {
+export function rejectAudioVideoCall(senderId, callType) {
     return async (dispatch) => {
-        if (currentSocket) {
-            await currentSocket.emit('reject-call', { senderId, type });
+        const { dataChannel } = peerConnections[senderId] || {};
+        if (dataChannel && dataChannel.readyState === 'open') {
+            dataChannel.send(JSON.stringify({
+                type: 'audio-video-negotiation',
+                msg: {
+                    msgType: 'reject-call',
+                    callType
+                }
+            }));
             dispatch({
-                type: type === 'audio' ? REJECT_AUDIO_CALL : REJECT_VIDEO_CALL,
+                type: callType === 'audio' ? REJECT_AUDIO_CALL : REJECT_VIDEO_CALL,
                 otherUser: senderId
             });
         }
@@ -196,17 +211,29 @@ export function rejectAudioVideoCall(senderId, type) {
 }
 
 export function endAudioVideoCall(recipientId, type) {
-    const { localAudioStream, localVideoStream } = audioVideoPeerConnections[recipientId] || {};
+    const { localAudioStream, localVideoStream } = peerConnections[recipientId] || {};
     if (type === 'audio') {
         localAudioStream && localAudioStream.getTracks().forEach(track => track.stop());
+        peerConnections[recipientId].localAudioStream = null;
+        peerConnections[recipientId].remoteAudioStream = null;
         appStore.dispatch({ type: END_AUDIO_CALL });
     } else if (type === 'video') {
         localVideoStream && localVideoStream.getTracks().forEach(track => track.stop());
+        peerConnections[recipientId].localVideoStream = null;
+        peerConnections[recipientId].remoteVideoStream = null;
         appStore.dispatch({ type: END_VIDEO_CALL });
     }
 }
 
-export function leaveChat(recipientId, type) {
-    closePeerConnection(recipientId, type);
-    currentSocket && currentSocket.emit('leave-chat', { recipientId, type });
+export function leaveChat(recipientId, callType) {
+    const { dataChannel } = peerConnections[recipientId] || {};
+    if (dataChannel && dataChannel.readyState === 'open') {
+        dataChannel.send(JSON.stringify({
+            type: 'audio-video-negotiation',
+            msg: {
+                msgType: 'leave-chat',
+                callType
+            }
+        }));
+    }
 }

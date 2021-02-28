@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { audioVideoPeerConnections, leaveChat } from "../../store/actions";
+import { peerConnections, leaveChat } from "../../store/actions";
 import EndCallIcon from "../common/icons/EndCallIcon";
 import UserCircleIcon from "../common/icons/UserCircleIcon";
 import useTimer from "../hooks/useTimer";
@@ -10,8 +10,8 @@ export default function AudioCallOngoing({ endAudioVideoCall, audioCall }) {
     const { durationString } = useTimer();
 
     useEffect(() => {
-        if (audioCall.ongoing && audioCall.otherUser && audioVideoPeerConnections[audioCall.otherUser]) {
-            const { remoteAudioStream } = audioVideoPeerConnections[audioCall.otherUser];
+        if (audioCall.ongoing && audioCall.otherUser && peerConnections[audioCall.otherUser]) {
+            const { remoteAudioStream } = peerConnections[audioCall.otherUser];
             remoteAudioRef.current.srcObject = remoteAudioStream;
         }
     }, [audioCall]);

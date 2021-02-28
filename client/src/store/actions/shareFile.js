@@ -8,7 +8,7 @@ import {
 } from './actionTypes';
 
 import * as streamSaver from 'streamsaver';
-import { dataChannelPeerConnections } from './connections';
+import { peerConnections } from './connections';
 
 const BYTES_PER_CHUNK = 16000;
 let fileReader = {}, downloadStream = {}, downloadWriter = {};
@@ -92,7 +92,7 @@ async function sendFile(recipientId, file) {
     const fileName = file.name;
     let bytesSent = 0, uploadProgress = 0, uploadStartTime = Date.now();
 
-    const { dataChannel } = dataChannelPeerConnections[recipientId] || {};
+    const { dataChannel } = peerConnections[recipientId] || {};
     if (dataChannel && dataChannel.readyState === 'open') {
         dataChannel.send(JSON.stringify({
             type: "file-metadata",
@@ -187,7 +187,7 @@ export function openFileSharingWidget(recipientId) {
 
 export function requestShareFile(recipientId, senderId, file) {
     return (dispatch) => {
-        const { dataChannel } = dataChannelPeerConnections[recipientId] || {};
+        const { dataChannel } = peerConnections[recipientId] || {};
         if (dataChannel && dataChannel.readyState === 'open') {
             dataChannel.send(JSON.stringify({
                 type: 'file-share-negotiation',
@@ -210,7 +210,7 @@ export function requestShareFile(recipientId, senderId, file) {
 
 export function acceptShareFile(recipientId, accepterId) {
     return (dispatch) => {
-        const { dataChannel } = dataChannelPeerConnections[recipientId] || {};
+        const { dataChannel } = peerConnections[recipientId] || {};
         if (dataChannel && dataChannel.readyState === 'open') {
             dataChannel.send(JSON.stringify({
                 type: 'file-share-negotiation',
@@ -229,7 +229,7 @@ export function acceptShareFile(recipientId, accepterId) {
 
 export function rejectShareFile(recipientId, rejecterId) {
     return async (dispatch) => {
-        const { dataChannel } = dataChannelPeerConnections[recipientId] || {};
+        const { dataChannel } = peerConnections[recipientId] || {};
         if (dataChannel && dataChannel.readyState === 'open') {
             dataChannel.send(JSON.stringify({
                 type: 'file-share-negotiation',
@@ -252,7 +252,7 @@ export function endFileSharing(otherUserId) {
 }
 
 export function leaveFileSharing(recipientId, leaverId) {
-    const { dataChannel } = dataChannelPeerConnections[recipientId] || {};
+    const { dataChannel } = peerConnections[recipientId] || {};
     if (dataChannel && dataChannel.readyState === 'open') {
         dataChannel.send(JSON.stringify({
             type: 'file-share-negotiation',

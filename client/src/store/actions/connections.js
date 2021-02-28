@@ -1,2 +1,1 @@
-export let dataChannelPeerConnections = {};
-export let audioVideoPeerConnections = {};
+export let peerConnections = {};

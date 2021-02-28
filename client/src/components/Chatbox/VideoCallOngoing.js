@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 
-import { leaveChat, audioVideoPeerConnections } from '../../store/actions';
+import { leaveChat, peerConnections } from '../../store/actions';
 import EndCallIcon from '../common/icons/EndCallIcon';
 
 export default function VideoCallOngoing({ videoCall, endAudioVideoCall }) {
@@ -8,8 +8,8 @@ export default function VideoCallOngoing({ videoCall, endAudioVideoCall }) {
     const remoteVideoRef = useRef();
 
     useEffect(() => {
-        if (videoCall.ongoing && videoCall.otherUser && audioVideoPeerConnections[videoCall.otherUser]) {
-            const { localVideoStream, remoteVideoStream } = audioVideoPeerConnections[videoCall.otherUser];
+        if (videoCall.ongoing && videoCall.otherUser && peerConnections[videoCall.otherUser]) {
+            const { localVideoStream, remoteVideoStream } = peerConnections[videoCall.otherUser];
             localVideoRef.current.srcObject = localVideoStream;
             remoteVideoRef.current.srcObject = remoteVideoStream;
         }
