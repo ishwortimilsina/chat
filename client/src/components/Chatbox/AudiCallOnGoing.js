@@ -10,11 +10,10 @@ export default function AudioCallOngoing({ endAudioVideoCall, audioCall }) {
     const { durationString } = useTimer();
 
     useEffect(() => {
-        if (audioCall.ongoing && audioCall.otherUser && peerConnections[audioCall.otherUser]) {
-            const { remoteAudioStream } = peerConnections[audioCall.otherUser];
-            remoteAudioRef.current.srcObject = remoteAudioStream;
+        if (audioCall.remoteAudioReady && peerConnections[audioCall.otherUser].remoteAudioStream) {
+            remoteAudioRef.current.src = peerConnections[audioCall.otherUser].remoteAudioStream.url;
         }
-    }, [audioCall]);
+    }, [audioCall.remoteAudioReady, audioCall.otherUser]);
 
     return (
         <>

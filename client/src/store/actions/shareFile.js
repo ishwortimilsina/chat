@@ -9,6 +9,7 @@ import {
 
 import * as streamSaver from 'streamsaver';
 import { peerConnections } from './connections';
+import { arrBuffToStr, strToArrBuff } from '../../utils/utils';
 
 const BYTES_PER_CHUNK = 16000;
 let fileReader = {}, downloadStream = {}, downloadWriter = {};
@@ -16,27 +17,6 @@ const fileShareEvents = {
     onrequestaccept: {},
     onrequestreject: {}
 };
-
-/**
- * Converts an array buffer to string 
- * @param {ArrayBuffer} buff 
- */
-function arrBuffToStr(buff) {
-    return String.fromCharCode.apply(null, new Uint8Array(buff));
-}
-
-/**
- * Converts an string to an array buffer
- * @param {string} str 
- */
-function strToArrBuff(str) {
-    const buff = new ArrayBuffer(str.length);
-    const buffView = new Uint8Array(buff);
-    for (let i = 0, strLen = str.length; i < strLen; i++) {
-        buffView[i] = str.charCodeAt(i);
-    }
-    return buff;
-}
 
 function clearUserFileShareEvents(otherUserId, abortOrClose) {
     fileShareEvents.onrequestaccept[otherUserId] = undefined;
@@ -78,7 +58,7 @@ export function processDownloadStream(data, otherUserId) {
     });
 
     if (downloadStream[otherUserId] && downloadWriter[otherUserId]) {
-        downloadWriter[otherUserId].write(new Uint8Array(fileData))
+        downloadWriter[otherUserId].write(new Uint8Array(fileData));
         if (bytesReceived === shareFileMetadata.fileSize) {
             clearUserFileShareEvents(otherUserId, "close");
         }

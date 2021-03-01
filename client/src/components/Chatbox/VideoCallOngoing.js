@@ -8,12 +8,17 @@ export default function VideoCallOngoing({ videoCall, endAudioVideoCall }) {
     const remoteVideoRef = useRef();
 
     useEffect(() => {
-        if (videoCall.ongoing && videoCall.otherUser && peerConnections[videoCall.otherUser]) {
-            const { localVideoStream, remoteVideoStream } = peerConnections[videoCall.otherUser];
-            localVideoRef.current.srcObject = localVideoStream;
-            remoteVideoRef.current.srcObject = remoteVideoStream;
+        if (videoCall.remoteVideoReady && peerConnections[videoCall.otherUser].remoteVideoStream) {
+            remoteVideoRef.current.src = peerConnections[videoCall.otherUser].remoteVideoStream.url;
+            peerConnections[videoCall.otherUser].remoteVideoStream.videoElem = remoteVideoRef.current;
         }
-    }, [videoCall]);
+    }, [videoCall.remoteVideoReady, videoCall.otherUser]);
+
+    useEffect(() => {
+        if (videoCall.localVideoReady) {
+            localVideoRef.current.srcObject = peerConnections[videoCall.otherUser].localVideoStream;
+        }
+    }, [videoCall.localVideoReady, videoCall.otherUser]);
 
     return (
         <div className="actual-videos-container">
