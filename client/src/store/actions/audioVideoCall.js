@@ -44,6 +44,9 @@ function createRemoteStreamMediaSource(callType, otherUserId) {
         mediaSource,
         sourceBuffer: null,
         arrayOfArrayBuffers: [],
+        bytesReceived: 0,
+        msgCount: 0,
+        streamStartTime: Date.now(),    
         url: URL.createObjectURL(mediaSource),
         appendToSourceBuffer: function() {
             if (this.mediaSource.readyState === "open" && this.sourceBuffer && this.sourceBuffer.updating === false) {
@@ -87,6 +90,8 @@ export function processAudioVideoDownloadStream(data, callType, otherUserId) {
     if (audioVideoData && remoteStreams[otherUserId] && remoteStreams[otherUserId].arrayOfArrayBuffers) {
         remoteStreams[otherUserId].arrayOfArrayBuffers.push(new Uint8Array(audioVideoData));
         remoteStreams[otherUserId].appendToSourceBuffer();
+        remoteStreams[otherUserId].bytesReceived += audioVideoData.byteLength;
+        remoteStreams[otherUserId].msgCount += 1;
     }
 }
 
