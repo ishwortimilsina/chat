@@ -1,3 +1,6 @@
+export const CONNECTED = 'connected';
+export const DISCONNECTED = 'disconnected';
+
 export const SET_CONTACTS = 'contacts:set';
 export const ADD_CONTACT = 'contact:add';
 export const REMOVE_CONTACT = 'contact:remove';

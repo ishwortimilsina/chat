@@ -4,7 +4,7 @@ import { endAudioVideoCall, acceptAudioVideoCall, rejectAudioVideoCall, leaveCha
 import EndCallIcon from '../common/icons/EndCallIcon';
 import IncomingCallIcon from '../common/icons/IncomingCallIcon';
 import OutgoingCallIcon from '../common/icons/OutgoingCallIcon';
-import CallNotifier from './CallNotifier';
+import CallNotifier from '../common/components/Modal';
 import VideoCallOngoing from './VideoCallOngoing';
 
 function VideoCallContainer({ videoCall, acceptAudioVideoCall, rejectAudioVideoCall, selectContact }) {

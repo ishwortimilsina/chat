@@ -6,7 +6,7 @@ import FileDownloadIcon from '../common/icons/FileDownloadIcon';
 import FileUploadIcon from '../common/icons/FileUploadIcon';
 import ThumbDownIcon from '../common/icons/ThumbDownIcon';
 import ThumbUpIcon from '../common/icons/ThumbUpIcon';
-import CallNotifier from './CallNotifier';
+import CallNotifier from '../common/components/Modal';
 import ShareFileOngoing from './ShareFileOngoing';
 
 function ShareFileContainer({ shareFile, requestShareFile, rejectShareFile, acceptShareFile, selectContact, currUserId }) {

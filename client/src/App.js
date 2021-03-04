@@ -1,29 +1,41 @@
 import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
+import { useLocation } from 'wouter';
 import * as uuid from 'uuid';
 
 import './App.css';
 
 import { AppContext } from './contexts/AppContext';
 import MainContainer from './components/MainContainer';
-import { establishConnection } from './store/actions';
+import Landing from './components/Landing';
 
-function App({ establishConnection }) {
+function App({ status }) {
+    const [location] = useLocation();
     const [cred, setCred] = useState({});
+
     useEffect(() => {
         const userId = uuid.v1();
-        const userName = uuid.v1();
+        const localChatIdentity = JSON.parse(localStorage.getItem('chat-identity'));
+        const userName = localChatIdentity && localChatIdentity.userName;
+
         setCred({ userId, userName });
-        establishConnection(userId, userName);
-    }, [establishConnection]);
+    }, []);
 
     return (
-        <AppContext.Provider value={{...cred}}>
+        <AppContext.Provider value={{ ...cred, status }}>
             <div className="App">
-                <MainContainer />
+                {
+                    location === "/"
+                    ? <Landing />
+                    : <MainContainer />
+                }
             </div>
         </AppContext.Provider>
     );
 }
 
-export default connect(null, { establishConnection })(App);
+const mapStateToProps = (state) => ({
+    status: state.status
+});
+
+export default connect(mapStateToProps)(App);

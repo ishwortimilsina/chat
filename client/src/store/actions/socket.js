@@ -1,7 +1,5 @@
 import { io } from "socket.io-client";
-import { ADD_CONTACT, REMOVE_CONTACT, SET_CONTACTS } from "./actionTypes";
-import { initializeSocketForAudioVideoCall } from "./audioVideoCall";
-import { initializeSocketForShareFile } from "./shareFile";
+import { ADD_CONTACT, CONNECTED, DISCONNECTED, REMOVE_CONTACT, SET_CONTACTS } from "./actionTypes";
 import { initializeSocketForDataConnection } from './dataConnection';
 import { initializeSocketForPeerConnection } from "./peerConnection";
 
@@ -15,6 +13,14 @@ export function establishConnection(id, name) {
                     transports: ["websocket"]
                 },
             );
+
+            newSocket.on('connect', () => {
+                dispatch({ type: CONNECTED });
+            });
+
+            newSocket.on('disconnect', () => {
+                dispatch({ type: DISCONNECTED });
+            });
 
             newSocket.on('contacts-list', data => {
                 dispatch({

@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { peerConnections, leaveChat } from "../../store/actions";
 import EndCallIcon from "../common/icons/EndCallIcon";
 import UserCircleIcon from "../common/icons/UserCircleIcon";
-import useTimer from "../hooks/useTimer";
+import useTimer from "../common/hooks/useTimer";
 
 export default function AudioCallOngoing({ endAudioVideoCall, audioCall }) {
     const remoteAudioRef = useRef();

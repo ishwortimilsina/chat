@@ -1,7 +1,7 @@
 import { endAudioVideoCall } from "../../store/actions";
 import CallMissedIcon from "../common/icons/CallMissedIcon";
 import EndCallIcon from "../common/icons/EndCallIcon";
-import CallNotifier from "./CallNotifier";
+import CallNotifier from "../common/components/Modal";
 
 export default function OtherUserDisconnected({ otherUser, type }) {
     return (
