@@ -84,6 +84,12 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('check-room-availability', ({ roomId }) => {
+        io.to(socket.id).emit('room-availability', {
+            isAvailable: !!io.sockets.adapter.rooms.get(roomId)
+        });
+    });
+
     socket.on('disconnect', () => {
         console.log(`Client ${userId} with socket id ${socket.id} disconnected.`);
         sendThisContactActivenessToAllOtherClients(false);

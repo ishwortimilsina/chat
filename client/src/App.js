@@ -6,12 +6,14 @@ import * as uuid from 'uuid';
 import './App.css';
 
 import { AppContext } from './contexts/AppContext';
-import MainContainer from './components/MainContainer';
-import Landing from './components/Landing';
+import Home from './components/Landing/Home';
+import LoginForm from './components/Landing/LoginForm';
+import Room from './components/Room';
+
 
 function App({ status }) {
-    const [location] = useLocation();
     const [cred, setCred] = useState({});
+    const [location] = useLocation();
 
     useEffect(() => {
         const userId = uuid.v1();
@@ -25,9 +27,11 @@ function App({ status }) {
         <AppContext.Provider value={{ ...cred, status }}>
             <div className="App">
                 {
-                    location === "/"
-                    ? <Landing />
-                    : <MainContainer />
+                    status.connected
+                        ? location === "/"
+                            ? <Home />
+                            : <Room />
+                        : <LoginForm userName="Ishwor Timilsina" userId="some-random-id" />
                 }
             </div>
         </AppContext.Provider>

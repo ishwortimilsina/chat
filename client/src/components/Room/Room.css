@@ -1,0 +1,20 @@
+.room-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.no-room-msg {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 1.3em;
+}
+
+.no-room-msg > strong {
+    font-size: 1.8em;
+    margin-bottom: 20px;
+}
