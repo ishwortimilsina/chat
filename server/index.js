@@ -1,18 +1,19 @@
 const app = require("express")();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
+const _ = require('lodash');
+const { generateRandomString } = require("./utils/utils");
 
 const PORT = process.env.PORT || 3001;
 
 const activeUsers = {};
+const rooms = {};
 
 io.on('connection', (socket) => {
     const userId = socket.handshake.query.id;
     console.log(`Client ${userId} with socket id ${socket.id} connected.`);
-    
-    // join my own room. All other users will send messages to this
-    // room if they are sending it to me
-    socket.join(userId);
+
+    socket.join("public");
 
     activeUsers[userId] = {
         socketId: socket.id,
@@ -21,21 +22,62 @@ io.on('connection', (socket) => {
         isActive: true
     };
 
+    socket.on('create-room', ({ roomName  }) => {
+        let roomId = generateRandomString().toLowerCase();
+        while (rooms[roomId]) {
+            roomId = generateRandomString();
+        }
+
+        rooms[roomId] = {
+            roomId,
+            roomName,
+            roomies: [],
+            isActive: false
+        };
+        io.to(socket.id).emit('create-room', {
+            roomId,
+            success: true
+        });
+    });
+
+    socket.on('check-room-availability', ({ roomId }) => {
+        io.to(socket.id).emit('room-availability', {
+            roomId,
+            isAvailable: !!rooms[roomId]
+        });
+    });
+
+    socket.on('join-room', ({ roomId }) => {
+        if (!rooms[roomId]) {
+            io.to(socket.id).emit('join-room', {
+                roomId,
+                success: false,
+                msg: 'Room does not exist.'
+            });
+        } else {
+            rooms[roomId].roomies.push(userId);
+            rooms[roomId].isActive = true;
+            io.to(socket.id).emit('join-room', {
+                roomId,
+                success: true
+            });
+        }
+    });
+
     // send all currently active contacts to this user
     function sendAllActiveContactsToThisClient() {
         const otherUsers = Object.values(activeUsers).filter(cont => cont.userId !== userId);
-        otherUsers.forEach(cont => delete cont.socketId);
+        otherUsers.forEach(cont => _.omitBy(cont, 'socketId'));
         socket.emit('contacts-list', { contacts: otherUsers });
     }
 
     // send this client to all other clients
     function sendThisContactActivenessToAllOtherClients(isActive) {
-        const currUser = { ...activeUsers[userId] };
-        delete currUser.socketId;
+        const currUser = _.omitBy(activeUsers[userId], 'socketId');
         const otherUsers = Object.values(activeUsers).filter(cont => cont.userId !== userId);
         otherUsers.forEach(cont => {
-            if (io.sockets.adapter.rooms.get(cont.userId)) {
-                socket.to(cont.userId).emit(isActive ? 'new-contact' : 'remove-contact', { contact: currUser });
+            if (activeUsers[cont.userId]) {
+                io.to(activeUsers[cont.userId].socketId).emit(isActive ? 'new-contact' : 'remove-contact', { contact: currUser });
             }
         });
     }
@@ -45,8 +87,8 @@ io.on('connection', (socket) => {
     socket.on('send-offer', (data) => {
         console.log(`Sending an offer from ${userId} to ${data.recipientId}.`);
 
-        if (io.sockets.adapter.rooms.get(data.recipientId)) {
-            socket.to(data.recipientId).emit('receive-offer', {
+        if (activeUsers[data.recipientId]) {
+            io.to(activeUsers[data.recipientId].socketId).emit('receive-offer', {
                 offererId: userId,
                 offer: data.offer,
                 type: data.type
@@ -59,8 +101,8 @@ io.on('connection', (socket) => {
     socket.on('answer-offer', (data) => {
         console.log(`${userId} answering the offer made by ${data.offererId}.`);
 
-        if (io.sockets.adapter.rooms.get(data.offererId)) {
-            socket.to(data.offererId).emit('receive-answer', {
+        if (activeUsers[data.offererId]) {
+            io.to(activeUsers[data.offererId].socketId).emit('receive-answer', {
                 answererId: userId,
                 answer: data.answer,
                 type: data.type
@@ -73,8 +115,8 @@ io.on('connection', (socket) => {
     socket.on('send-candidate', (data) => {
         console.log(`Sending candidate from ${userId} to ${data.recipientId}.`);
 
-        if (io.sockets.adapter.rooms.get(data.recipientId)) {
-            socket.to(data.recipientId).emit('receive-candidate', {
+        if (activeUsers[data.recipientId]) {
+            io.to(activeUsers[data.recipientId].socketId).emit('receive-candidate', {
                 senderId: userId,
                 candidate: data.candidate,
                 type: data.type
@@ -82,12 +124,6 @@ io.on('connection', (socket) => {
         } else {
             console.log(`User id ${data.recipientId} is not connected.`);
         }
-    });
-
-    socket.on('check-room-availability', ({ roomId }) => {
-        io.to(socket.id).emit('room-availability', {
-            isAvailable: !!io.sockets.adapter.rooms.get(roomId)
-        });
     });
 
     socket.on('disconnect', () => {

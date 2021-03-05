@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { useLocation } from 'wouter';
-import * as uuid from 'uuid';
 
 import './App.css';
 
@@ -9,6 +8,7 @@ import { AppContext } from './contexts/AppContext';
 import Home from './components/Landing/Home';
 import LoginForm from './components/Landing/LoginForm';
 import Room from './components/Room';
+import { generateRandomString } from './utils/utils';
 
 
 function App({ status }) {
@@ -16,7 +16,7 @@ function App({ status }) {
     const [location] = useLocation();
 
     useEffect(() => {
-        const userId = uuid.v1();
+        const userId = generateRandomString(16);
         const localChatIdentity = JSON.parse(localStorage.getItem('chat-identity'));
         const userName = localChatIdentity && localChatIdentity.userName;
 

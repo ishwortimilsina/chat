@@ -16,10 +16,15 @@ export default function Room() {
     useEffect(() => {
         (async function checkingRoomAvailability() {
             await delay(1000);
-            const isRoomAvailable = await checkRoomExists(location.split("?")[0]);
-            setIsAvailable(isRoomAvailable);
+
+            const currentRoom = location.split("?")[0].split("/")[1]
+            const { roomId, isRoomAvailable } = await checkRoomExists(currentRoom);
+
             setIsChecking(false);
-            if (!isRoomAvailable) {
+
+            if (roomId === currentRoom) {
+                setIsAvailable(isRoomAvailable);
+            } else {
                 await delay(3000);
                 setLocation("/");
             }

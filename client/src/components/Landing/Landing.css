@@ -88,13 +88,13 @@
     justify-content: center;
     align-items: center;
     margin: 20px;
+    cursor: pointer;
 }
 
 .home-menu-icon {
     height: 100px;
     width: 100px;
     margin: 20px;
-    cursor: pointer;
 }
 
 .home-menu-icon:hover {

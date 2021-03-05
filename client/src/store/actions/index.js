@@ -7,11 +7,26 @@ export { sendMessage } from './dataConnection';
 export { peerConnections } from './connections';
 
 export async function checkRoomExists(roomId) {
+    const _this = {};
     return new Promise((resolve) => {
         if (newSocket) {
             newSocket.emit('check-room-availability', { roomId });
-            newSocket.on('room-availability', ({ isAvailable }) => {
-                resolve(isAvailable);
+            _this.res = newSocket.on('room-availability', ({ roomId, isAvailable }) => {
+                resolve({ roomId, isRoomAvailable: isAvailable });
+                _this.res = null;
+            });
+        }
+    });
+}
+
+export async function createRoom({ roomName }) {
+    const _this = {};
+    return new Promise((resolve) => {
+        if (newSocket) {
+            newSocket.emit('create-room', { roomName });
+            _this.res = newSocket.on('create-room', ({ roomId, success, msg }) => {
+                resolve({ roomId, success, msg });
+                _this.res = null;
             });
         }
     });
