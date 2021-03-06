@@ -97,7 +97,7 @@
     margin: 20px;
 }
 
-.home-menu-icon:hover {
+.home-menu-item:hover .home-menu-icon {
     height: 120px;
     width: 120px;
     transition: 0.5s;
@@ -110,4 +110,8 @@
 .home-menu-item-text {
     font-size: 1.5em;
     font-weight: bold;
+}
+
+.home-menu-item:hover .home-menu-item-text {
+    font-size: 1.7em;
 }

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLocation } from 'wouter';
 
 import { createRoom } from '../../store/actions';
+import ArrowLeftIcon from '../common/icons/ArrowLeftIcon';
 import CopyIcon from '../common/icons/CopyIcon';
 import DoorOpenIcon from '../common/icons/DoorOpenIcon';
 import HomeIcon from '../common/icons/HomeIcon';
@@ -9,7 +10,7 @@ import LoadingIcon from '../common/icons/LoadingIcon';
 
 import './Room.css';
 
-export default function CreateRoom(props) {
+export default function CreateRoom({ goBack }) {
     const [ location, setLocation ] = useLocation();
     const [ roomName, setRoomName ] = useState('');
     const [ roomId, setRoomId ] = useState('');
@@ -53,6 +54,9 @@ export default function CreateRoom(props) {
 
     return (
         <form className="create-room-form">
+            <div className="go-back-button" onClick={goBack}>
+                <ArrowLeftIcon style={{ height: 30, width: 30 }} tooltip="Back" />
+            </div>
             <div className="create-room-form-header">
                 <HomeIcon tooltip="Create Room" style={{ height: 60, width: 60 }} />
                 CREATE ROOM

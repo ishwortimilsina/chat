@@ -17,7 +17,7 @@ export default function Home(props) {
                 <div className="home-menu-container">
                     {
                         selectedMenu === 'create-room'
-                            ? <CreateRoom />
+                            ? <CreateRoom goBack={() => selectMenu('')} />
                             : (
                                 <>
                                     <div className="home-menu-item" onClick={() => selectMenu('create-room')}>

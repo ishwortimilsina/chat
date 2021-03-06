@@ -19,6 +19,15 @@
     margin-bottom: 20px;
 }
 
+.go-back-button {
+    position: absolute;
+    cursor: pointer;
+}
+
+.go-back-button:hover {
+    opacity: 0.6;
+}
+
 .create-room-form {
     display: flex;
     flex-direction: column;
@@ -78,7 +87,7 @@
     margin: 12px 0;
     height: 70px;
     color: #19007c;
-    background-color: cadetblue;
+    background-color: #f3ffff;
 }
 
 .create-room-form label {
