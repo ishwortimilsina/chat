@@ -13,6 +13,7 @@ function ChatControllers(props) {
         if (props.selectedContact && text) {
             props.sendMessage({
                 recipient: props.selectedContact,
+                roomId: props.roomId,
                 text,
                 sender: cred.userId
             });

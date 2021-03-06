@@ -1,3 +1,5 @@
+import { appStore } from '../..';
+import { JOIN_ROOM } from './actionTypes';
 import { newSocket } from './socket';
 
 export async function checkRoomExists(roomId) {
@@ -32,6 +34,12 @@ export async function joinRoom({ roomId }) {
         if (newSocket) {
             newSocket.emit('join-room', { roomId });
             _this.res = newSocket.on('join-room', ({ roomId, roomName, success, msg }) => {
+                if (success) {
+                    appStore.dispatch({
+                        type: JOIN_ROOM,
+                        roomId
+                    });
+                }
                 resolve({ roomId, roomName, success, msg });
                 _this.res = null;
             });

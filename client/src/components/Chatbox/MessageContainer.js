@@ -21,7 +21,7 @@ function MessageContainer({ messages, selectedContact }) {
 
 const mapStateToProps = (state, ownProps) => {
     return {
-        messages: state.messages[ownProps.selectedContact] || []
+        messages: (state.messages[ownProps.roomId] && state.messages[ownProps.roomId][ownProps.selectedContact]) || []
     }
 };
 

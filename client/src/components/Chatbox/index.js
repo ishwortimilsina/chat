@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { connect } from 'react-redux';
 import { AppContext } from '../../contexts/AppContext';
+import { RoomContext } from '../../contexts/RoomContext';
 
 import { sendCallRequest, openFileSharingWidget } from '../../store/actions';
 import ShareIcon from '../common/icons/ShareIcon';
@@ -20,6 +21,7 @@ function Chatbox({ selectedContact, selectedContactName, selectContact, sendCall
     const shouldShowShareFileContainer = shareFile.openFileSharingWidget || shareFile.ongoing || shareFile.shareRequested || shareFile.acceptedRequest || shareFile.incomingRequest;
     const showOtherUserDisconnected = audioCall.disconnected || videoCall.disconnected || shareFile.disconnected;
     const cred = useContext(AppContext);
+    const { roomId } = useContext(RoomContext);
 
     return (
         <section className="chatbox">
@@ -60,8 +62,8 @@ function Chatbox({ selectedContact, selectedContactName, selectContact, sendCall
                                 />
                     : (
                         <>
-                            <MessageContainer selectedContact={selectedContact} />
-                            <ChatControllers selectedContact={selectedContact} />
+                            <MessageContainer roomId={roomId} selectedContact={selectedContact} />
+                            <ChatControllers roomId={roomId} selectedContact={selectedContact} />
                         </>
                     )
             }

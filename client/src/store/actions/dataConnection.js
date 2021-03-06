@@ -5,14 +5,15 @@ import { RECEIVE_MESSAGE, SEND_MESSAGE, SHARE_FILE_METADATA } from './actionType
 import { createDownloadStream, processDownloadStream, processFileShareNegotiation } from './shareFile';
 import { processAudioVideoNegotiation } from './audioVideoCall';
 
-export function sendMessage({ recipient, text, sender }) {
+export function sendMessage({ recipient, text, sender, roomId }) {
     return async (dispatch) => {
         try {
             const { dataChannel } = peerConnections[recipient] || {};
             if (dataChannel && dataChannel.readyState === 'open') {
-                dataChannel.send(JSON.stringify({ type: "text-message", text }));
+                dataChannel.send(JSON.stringify({ type: "text-message", body: { text, roomId } }));
                 dispatch({
                     type: SEND_MESSAGE,
+                    roomId,
                     recipient,
                     text,
                     sender,
@@ -33,8 +34,9 @@ function handleChannelMessage(msg, sender) {
             appStore.dispatch({
                 type: RECEIVE_MESSAGE,
                 sender,
+                roomId: data.body.roomId,
                 time: Date.now(),
-                text: data.text
+                text: data.body.text
             });
         } else if (data.type === "file-metadata") {
             appStore.dispatch({
