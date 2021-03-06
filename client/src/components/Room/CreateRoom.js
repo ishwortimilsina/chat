@@ -53,18 +53,18 @@ export default function CreateRoom({ goBack }) {
     }
 
     return (
-        <form className="create-room-form">
+        <form className="room-form">
             <div className="go-back-button" onClick={goBack}>
                 <ArrowLeftIcon style={{ height: 30, width: 30 }} tooltip="Back" />
             </div>
-            <div className="create-room-form-header">
+            <div className="room-form-header">
                 <HomeIcon tooltip="Create Room" style={{ height: 60, width: 60 }} />
                 CREATE ROOM
             </div>
-            <div className="create-room-form-body">
+            <div className="room-form-body">
                 <label>Room Name</label>
                 <input
-                    className="create-room-input"
+                    className="room-form-input"
                     type="text"
                     value={roomName || ''}
                     onChange={({ target }) => setRoomName(target.value)}
@@ -73,7 +73,7 @@ export default function CreateRoom({ goBack }) {
                 />
                 <label>Room ID</label>
                 <input
-                    className="create-room-input"
+                    className="room-form-input"
                     type="text"
                     value={roomId || ''}
                     onChange={null}
@@ -90,12 +90,12 @@ export default function CreateRoom({ goBack }) {
                 </div>
                 { copied ? <span className="copied-msg">Copied the link to clipboard.</span> : null }
             </div>
-            <div className="create-room-form-footer">
-                <div className={`create-room-submit-button${roomId ? '' : ' disable'}`} onClick={handleJoin}>
+            <div className="room-form-footer">
+                <div className={`room-submit-button${roomId ? '' : ' disable'}`} onClick={handleJoin}>
                     <DoorOpenIcon tooltip="Join Room" style={{ height: 20, width: 20 }} />
                     &emsp;Join
                 </div>
-                <div className={`create-room-submit-button${roomName ? '' : ' disable'}`} onClick={handleSubmit}>
+                <div className={`room-submit-button${roomName ? '' : ' disable'}`} onClick={handleSubmit}>
                     <HomeIcon tooltip="Create Room" style={{ height: 20, width: 20 }} />
                     &emsp;{ isSubmitting ? <LoadingIcon style={{ height: 80, width: 80 }} /> : 'Create' }
                 </div>

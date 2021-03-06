@@ -31,3 +31,16 @@ export async function createRoom({ roomName }) {
         }
     });
 }
+
+export async function joinRoom({ roomId }) {
+    const _this = {};
+    return new Promise((resolve) => {
+        if (newSocket) {
+            newSocket.emit('join-room', { roomId });
+            _this.res = newSocket.on('join-room', ({ roomId, roomName, success, msg }) => {
+                resolve({ roomId, roomName, success, msg });
+                _this.res = null;
+            });
+        }
+    });
+}

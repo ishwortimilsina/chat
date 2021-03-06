@@ -59,6 +59,7 @@ io.on('connection', (socket) => {
             rooms[roomId].isActive = true;
             io.to(socket.id).emit('join-room', {
                 roomId,
+                roomName: rooms[roomId].roomName,
                 success: true
             });
         }

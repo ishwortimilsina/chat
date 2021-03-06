@@ -28,7 +28,7 @@
     opacity: 0.6;
 }
 
-.create-room-form {
+.room-form {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -36,7 +36,7 @@
     padding: 15px 20px 20px 20px;
 }
 
-.create-room-form-header {
+.room-form-header {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -47,13 +47,13 @@
     flex-direction: column;
 }
 
-.create-room-form-body {
+.room-form-body {
     display: flex;
     flex-direction: column;
     flex: 1;
 }
 
-.create-room-submit-button {
+.room-submit-button {
     margin-top: 25px;
     padding: 8px 10px;
     font-weight: bold;
@@ -69,16 +69,16 @@
     align-items: center;
 }
 
-.create-room-submit-button:hover {
+.room-submit-button:hover {
     background: #8f94dd;
 }
 
-.create-room-submit-button:active {
+.room-submit-button:active {
     background: #343b8a;
     color: white;
 }
 
-.create-room-input {
+.room-form-input {
     padding: 10px 20px;
     font-size: 1.4em;
     border-radius: 8px;
@@ -90,13 +90,20 @@
     background-color: #f3ffff;
 }
 
-.create-room-form label {
+.room-form label {
     font-size: 1.2em;
     margin-bottom: -10px;
 }
 
 .room-link {
     margin-top: 50px;
+}
+
+.join-room-form .room-link {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
 }
 
 .room-link-link {
@@ -108,6 +115,10 @@
 
 .room-link-link > span {
     flex: 1;
+}
+
+.join-room-form .room-link-link {
+    width: 100%;
 }
 
 .copy-room-link {

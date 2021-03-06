@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 
-import { checkRoomExists } from '../../store/actions';
+import { joinRoom } from '../../store/actions';
 import { delay } from '../../utils/utils';
 import Modal from '../common/components/Modal';
 import LoadingIcon from '../common/icons/LoadingIcon';
@@ -10,20 +10,22 @@ import './Room.css';
 
 export default function Room() {
     const [ location, setLocation ] = useLocation();
+    const [ roomName, setRoomName ] = useState('');
     const [ isAvailable, setIsAvailable ] = useState(false);
     const [ isChecking, setIsChecking ] = useState(true);
 
     useEffect(() => {
-        (async function checkingRoomAvailability() {
+        (async function joiningRoom() {
             await delay(1000);
 
             const currentRoom = location.split("?")[0].split("/")[1]
-            const { roomId, isRoomAvailable } = await checkRoomExists(currentRoom);
+            const { roomId, roomName, success } = await joinRoom({ roomId: currentRoom });
 
             setIsChecking(false);
 
             if (roomId === currentRoom) {
-                setIsAvailable(isRoomAvailable);
+                setIsAvailable(success);
+                setRoomName(roomName)
             } else {
                 await delay(3000);
                 setLocation("/");
