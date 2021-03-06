@@ -95,7 +95,7 @@ export default function CreateRoom({ goBack }) {
                     <DoorOpenIcon tooltip="Join Room" style={{ height: 20, width: 20 }} />
                     &emsp;Join
                 </div>
-                <div className={`room-submit-button${roomName ? '' : ' disable'}`} onClick={handleSubmit}>
+                <div className={`room-submit-button${roomName && !roomId ? '' : ' disable'}`} onClick={handleSubmit}>
                     <HomeIcon tooltip="Create Room" style={{ height: 20, width: 20 }} />
                     &emsp;{ isSubmitting ? <LoadingIcon style={{ height: 80, width: 80 }} /> : 'Create' }
                 </div>

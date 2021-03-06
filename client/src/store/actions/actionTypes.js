@@ -2,6 +2,7 @@ export const CONNECTED = 'connected';
 export const DISCONNECTED = 'disconnected';
 
 export const JOIN_ROOM = 'room:join';
+export const LEAVE_ROOM = 'room:leave';
 
 export const SET_CONTACTS = 'contacts:set';
 export const ADD_CONTACT = 'contact:add';

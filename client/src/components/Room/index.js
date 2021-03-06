@@ -21,12 +21,11 @@ export default function Room() {
         (async function joiningRoom() {
             await delay(1000);
 
-            
             const { roomId, roomName, success } = await joinRoom({ roomId: currentRoomId });
 
             setIsChecking(false);
 
-            if (roomId === currentRoomId) {
+            if (roomId === currentRoomId && success) {
                 setIsAvailable(success);
                 setRoomName(roomName)
             } else {

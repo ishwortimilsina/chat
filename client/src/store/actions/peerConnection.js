@@ -16,7 +16,6 @@ async function makeOffer(userId, type) {
         const { peerConnection, dataChannel } = peerConnections[userId] || {};
 
         if (peerConnection) {
-            console.log(`Sending an offer to ${userId}`);
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
 
@@ -74,7 +73,6 @@ export function createPeerConnection(recipientId, type) {
 
     peerConnection.onicecandidate = function handleICECandidateEvent(event) {
         if (event.candidate) {
-            console.log(`Sending ICE candidate to ${recipientId}`);
             const { dataChannel } = peerConnections[recipientId];
             if (dataChannel && dataChannel.readyState === 'open') {
                 dataChannel.send(JSON.stringify({

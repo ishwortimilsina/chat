@@ -1,4 +1,4 @@
-import { ADD_CONTACT, CLEAR_CONTACTS, REMOVE_CONTACT, SET_CONTACTS } from "../actions/actionTypes";
+import { ADD_CONTACT, CLEAR_CONTACTS, LEAVE_ROOM, REMOVE_CONTACT, SET_CONTACTS } from "../actions/actionTypes";
 
 const initialState = [];
 
@@ -9,7 +9,8 @@ export function contactsReducer(state=initialState, action) {
         case ADD_CONTACT:
             return [ ...state, action.contact ];
         case REMOVE_CONTACT:
-            return state.filter(cont => cont.userName !== action.contact.userName);
+            return state.filter(cont => cont.userId !== action.contact.userId);
+        case LEAVE_ROOM:
         case CLEAR_CONTACTS:
             return initialState;
         default:

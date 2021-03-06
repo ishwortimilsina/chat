@@ -68,10 +68,8 @@ function setupDataConnection(recipientId) {
     const dataChannel = peerConnection.createDataChannel('text-channel', { reliable: true });
     peerConnections[recipientId].dataChannel = dataChannel;
 
-    dataChannel.onopen = (event) => console.log('Data channel is ready.');
     dataChannel.onerror = (error) => console.log(error);
-    dataChannel.onmessage = (msg) => handleChannelMessage(msg, recipientId)
-    dataChannel.onclose = (event) => console.log('Data channel is closed');
+    dataChannel.onmessage = (msg) => handleChannelMessage(msg, recipientId);
 }
 
 export function initializeSocketForDataConnection(newSocket) {
@@ -83,8 +81,6 @@ export function initializeSocketForDataConnection(newSocket) {
     // When this user recieves an offer, create an answer and reply to the offerer
     newSocket.on('receive-offer', async ({ offererId, offer, type }) => {
         if (type === 'datachannel') {
-            console.log(`A ${type} offer received from ${offererId}`);
-
             createPeerConnection(offererId, type);
             const { peerConnection } = peerConnections[offererId];
             peerConnection.ondatachannel = function handleOnDataChannel(event) {
@@ -104,7 +100,6 @@ export function initializeSocketForDataConnection(newSocket) {
                 .then(() => peerConnection.createAnswer())
                 .then((answer) => peerConnection.setLocalDescription(answer))
                 .then(() => {
-                    console.log(`Sending the answer to the offer made by ${offererId}`);
                     newSocket.emit('answer-offer', {
                         offererId,
                         answer: peerConnection.localDescription,
@@ -119,7 +114,6 @@ export function initializeSocketForDataConnection(newSocket) {
     // when this user receives an answer to the offer made
     newSocket.on('receive-answer', ({ answererId, answer, type }) => {
         if (type === 'datachannel') {
-            console.log(`Received an answer from ${answererId} to the ${type} offer made.`);
             const { peerConnection } = peerConnections[answererId] || {};
             if (peerConnection && peerConnection.localDescription) {
                 peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
@@ -132,7 +126,6 @@ export function initializeSocketForDataConnection(newSocket) {
     // when this user receives an ICE candidate
     newSocket.on('receive-candidate', ({ senderId, candidate, type }) => {
         if (type === 'datachannel') {
-            console.log(`Received an ICE candidate from ${senderId} for ${type}.`);
             const { peerConnection } = peerConnections[senderId] || {};
             // deliver the candidate to the local ICE layer
             if (peerConnection && peerConnection.localDescription) {

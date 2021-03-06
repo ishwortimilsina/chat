@@ -1,5 +1,5 @@
 import { appStore } from '../..';
-import { JOIN_ROOM } from './actionTypes';
+import { JOIN_ROOM, LEAVE_ROOM } from './actionTypes';
 import { newSocket } from './socket';
 
 export async function checkRoomExists(roomId) {
@@ -41,6 +41,25 @@ export async function joinRoom({ roomId }) {
                     });
                 }
                 resolve({ roomId, roomName, success, msg });
+                _this.res = null;
+            });
+        }
+    });
+}
+
+export async function leaveRoom({ roomId }) {
+    const _this = {};
+    return new Promise((resolve) => {
+        if (newSocket) {
+            newSocket.emit('leave-room', { roomId });
+            _this.res = newSocket.on('leave-room', ({ roomId, success, msg }) => {
+                if (success) {
+                    appStore.dispatch({
+                        type: LEAVE_ROOM,
+                        roomId
+                    });
+                }
+                resolve({ roomId, success, msg });
                 _this.res = null;
             });
         }
