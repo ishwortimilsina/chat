@@ -4,6 +4,7 @@ export const DISCONNECTED = 'disconnected';
 export const SET_CONTACTS = 'contacts:set';
 export const ADD_CONTACT = 'contact:add';
 export const REMOVE_CONTACT = 'contact:remove';
+export const CLEAR_CONTACTS = 'contact:clear';
 
 export const SEND_MESSAGE = 'message:send';
 export const RECEIVE_MESSAGE = 'message:receive';

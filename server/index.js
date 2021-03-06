@@ -19,6 +19,7 @@ io.on('connection', (socket) => {
         socketId: socket.id,
         userId,
         userName: socket.handshake.query.name,
+        rooms: [],
         isActive: true
     };
 
@@ -55,6 +56,9 @@ io.on('connection', (socket) => {
                 msg: 'Room does not exist.'
             });
         } else {
+            if (!activeUsers[userId].rooms.includes(roomId)) {
+                activeUsers[userId].rooms.push(roomId);
+            }
             rooms[roomId].roomies.push(userId);
             rooms[roomId].isActive = true;
             io.to(socket.id).emit('join-room', {
@@ -62,28 +66,35 @@ io.on('connection', (socket) => {
                 roomName: rooms[roomId].roomName,
                 success: true
             });
+            sendAllActiveContactsToThisClient(roomId);
+            sendThisContactActivenessToAllOtherClients(true, roomId);
         }
     });
 
-    // send all currently active contacts to this user
-    function sendAllActiveContactsToThisClient() {
-        const otherUsers = Object.values(activeUsers).filter(cont => cont.userId !== userId);
+    // send all currently active contacts in the room to this user
+    function sendAllActiveContactsToThisClient(roomId) {
+        const otherUsers = Object.values(activeUsers).filter(cont => {
+            return cont.userId !== userId && rooms[roomId].roomies.includes(cont.userId)
+        });
         otherUsers.forEach(cont => _.omitBy(cont, 'socketId'));
-        socket.emit('contacts-list', { contacts: otherUsers });
+        socket.emit('contacts-list', { roomId, contacts: otherUsers });
     }
 
-    // send this client to all other clients
-    function sendThisContactActivenessToAllOtherClients(isActive) {
+    // send this client to all other clients in the room
+    function sendThisContactActivenessToAllOtherClients(isActive, roomId) {
         const currUser = _.omitBy(activeUsers[userId], 'socketId');
-        const otherUsers = Object.values(activeUsers).filter(cont => cont.userId !== userId);
+        const otherUsers = Object.values(activeUsers).filter(cont => {
+            return cont.userId !== userId && rooms[roomId].roomies.includes(cont.userId)
+        });
         otherUsers.forEach(cont => {
             if (activeUsers[cont.userId]) {
-                io.to(activeUsers[cont.userId].socketId).emit(isActive ? 'new-contact' : 'remove-contact', { contact: currUser });
+                io.to(activeUsers[cont.userId].socketId).emit(
+                    isActive ? 'new-contact' : 'remove-contact',
+                    { roomId, contact: currUser }
+                );
             }
         });
     }
-    sendThisContactActivenessToAllOtherClients(true);
-    sendAllActiveContactsToThisClient();
 
     socket.on('send-offer', (data) => {
         console.log(`Sending an offer from ${userId} to ${data.recipientId}.`);
@@ -129,7 +140,11 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log(`Client ${userId} with socket id ${socket.id} disconnected.`);
-        sendThisContactActivenessToAllOtherClients(false);
+        // send to all contacts in all rooms that this client was connected
+        // that this client is now disconnected
+        activeUsers[userId].rooms.forEach((roomId) => {
+            sendThisContactActivenessToAllOtherClients(false, roomId);
+        });
         delete activeUsers[userId];
     });
 });

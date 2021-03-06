@@ -1,5 +1,6 @@
 import { io } from "socket.io-client";
-import { ADD_CONTACT, CONNECTED, DISCONNECTED, REMOVE_CONTACT, SET_CONTACTS } from "./actionTypes";
+import { CONNECTED, DISCONNECTED } from "./actionTypes";
+import { initiateSocketsForContactsHandling } from "./contacts";
 import { initializeSocketForDataConnection } from './dataConnection';
 import { initializeSocketForPeerConnection } from "./peerConnection";
 
@@ -24,26 +25,7 @@ export function establishConnection(id, name) {
                 newSocket = null;
             });
 
-            newSocket.on('contacts-list', data => {
-                dispatch({
-                    type: SET_CONTACTS,
-                    contacts: data.contacts
-                });
-            });
-
-            newSocket.on('new-contact', data => {
-                dispatch({
-                    type: ADD_CONTACT,
-                    contact: data.contact
-                });
-            });
-
-            newSocket.on('remove-contact', data => {
-                dispatch({
-                    type: REMOVE_CONTACT,
-                    contact: data.contact
-                });
-            });
+            initiateSocketsForContactsHandling(newSocket);
 
             initializeSocketForPeerConnection(newSocket);
             initializeSocketForDataConnection(newSocket);
