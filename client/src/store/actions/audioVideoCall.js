@@ -214,13 +214,17 @@ export function endAudioVideoCall(recipientId, type) {
     const { localAudioStream, localVideoStream } = peerConnections[recipientId] || {};
     if (type === 'audio') {
         localAudioStream && localAudioStream.getTracks().forEach(track => track.stop());
-        peerConnections[recipientId].localAudioStream = null;
-        peerConnections[recipientId].remoteAudioStream = null;
+        if (peerConnections[recipientId]) {
+            peerConnections[recipientId].localAudioStream = null;
+            peerConnections[recipientId].remoteAudioStream = null;
+        }
         appStore.dispatch({ type: END_AUDIO_CALL });
     } else if (type === 'video') {
         localVideoStream && localVideoStream.getTracks().forEach(track => track.stop());
-        peerConnections[recipientId].localVideoStream = null;
-        peerConnections[recipientId].remoteVideoStream = null;
+        if (peerConnections[recipientId]) {
+            peerConnections[recipientId].localVideoStream = null;
+            peerConnections[recipientId].remoteVideoStream = null;
+        }
         appStore.dispatch({ type: END_VIDEO_CALL });
     }
 }
