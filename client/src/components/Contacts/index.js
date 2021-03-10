@@ -29,8 +29,8 @@ function Contacts({ contacts, selectedContact, selectContact }) {
     );
 }
 
-const mapStateToProps = (state) => {
-    return { contacts: state.contacts };
-}
+const mapStateToProps = (state) => ({
+    contacts: Object.values(state.contacts)
+});
 
 export default connect(mapStateToProps)(Contacts);

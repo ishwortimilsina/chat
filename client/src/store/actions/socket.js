@@ -3,6 +3,7 @@ import { CONNECTED, DISCONNECTED } from "./actionTypes";
 import { initiateSocketsForContactsHandling } from "./contacts";
 import { initializeSocketForDataConnection } from './dataConnection';
 import { initializeSocketForPeerConnection } from "./peerConnection";
+import { initializeSocketForRooms } from "./rooms";
 
 export let newSocket = null;
 export function establishConnection(id, name) {
@@ -26,6 +27,8 @@ export function establishConnection(id, name) {
             });
 
             initiateSocketsForContactsHandling(newSocket);
+
+            initializeSocketForRooms(newSocket);
 
             initializeSocketForPeerConnection(newSocket);
             initializeSocketForDataConnection(newSocket);

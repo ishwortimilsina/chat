@@ -11,7 +11,7 @@ const Modal = props => {
                 style={{
                     height: props.height || 300,
                     width: props.width || 450,
-                    backgroundColor: props.backgroundColor || "#72baac"
+                    backgroundColor: props.backgroundColor || "#e9eaff"
                 }}
             >
                 {props.children}

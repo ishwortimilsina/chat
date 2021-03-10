@@ -8,6 +8,8 @@ const PORT = process.env.PORT || 3001;
 
 const activeUsers = {};
 const rooms = {};
+let meetStrangerRoom = [];
+let strangerPairs = new Map();
 
 io.on('connection', (socket) => {
     const userId = socket.handshake.query.id;
@@ -31,8 +33,6 @@ io.on('connection', (socket) => {
                 otherUsers.push({ userId: cont.userId, userName: cont.userName, isActive: cont.isActive });
             }
         });
-
-        console.log(otherUsers)
         socket.emit('contacts-list', { roomId, contacts: otherUsers });
     }
 
@@ -50,6 +50,51 @@ io.on('connection', (socket) => {
                 );
             }
         });
+    }
+
+    async function sendNewStrangerToThisClient() {
+        const getRandomIndex = () => Math.floor(Math.random() * meetStrangerRoom.length);
+
+        if (meetStrangerRoom.length > 1) {
+            let randomIndex = getRandomIndex();
+            let triesToFindStranger = 0;
+
+            while (
+                triesToFindStranger < 100 &&
+                meetStrangerRoom[randomIndex] === userId &&
+                activeUsers[meetStrangerRoom[randomIndex]] &&
+                !strangerPairs.has(meetStrangerRoom[randomIndex])
+            ) {
+                randomIndex = meetStrangerRoom[getRandomIndex()];
+            }
+
+            if (
+                meetStrangerRoom[randomIndex] !== userId &&
+                activeUsers[meetStrangerRoom[randomIndex]] &&
+                !strangerPairs.has(meetStrangerRoom[randomIndex])
+            ) {
+                const chosenContact =  _.omit(activeUsers[meetStrangerRoom[randomIndex]], ['socketId', 'rooms']);
+                if (chosenContact) {
+                    // send this new stranger's contact to self
+                    strangerPairs.set(userId, chosenContact.userId);
+                    socket.emit('new-contact', {
+                        roomId: "meet-stranger",
+                        contact: chosenContact,
+                        connInitiator: true // so that one, not both, sends an 'offer' to the other
+                    });
+
+                    // send self's contact to this stranger
+                    strangerPairs.set(chosenContact.userId, userId);
+                    io.to(activeUsers[meetStrangerRoom[randomIndex]].socketId).emit('new-contact', {
+                        roomId: "meet-stranger",
+                        contact: _.omit(activeUsers[userId], ['socketId', 'rooms'])
+                    });
+                    return meetStrangerRoom[randomIndex];
+                }
+            }
+        }
+        // if no stranger is found to connect self too, delete it from the strangerPairs Map
+        strangerPairs.delete(userId);
     }
 
     socket.on('create-room', ({ roomName  }) => {
@@ -118,6 +163,36 @@ io.on('connection', (socket) => {
         });
     });
 
+    function deletePairAndLetPartnerKnow() {
+        const partner = strangerPairs.get(userId);
+        strangerPairs.delete(userId);
+        if (partner) {
+            strangerPairs.delete(partner);
+            // tell the other user (stranger) to remove this user and get another one
+            if (activeUsers[partner]) {
+                io.to(activeUsers[partner].socketId).emit('stranger-left', { strangerId: userId });
+            }
+        }
+    }
+
+    socket.on('join-meet-stranger-room', () => {
+        socket.join('meet-stranger');
+        meetStrangerRoom.push(userId);
+        socket.emit('join-meet-stranger-room', { success: true });
+        sendNewStrangerToThisClient();
+    });
+
+    socket.on('leave-meet-stranger-room', () => {
+        socket.leave('meet-stranger');
+        meetStrangerRoom = meetStrangerRoom.filter(id => id !== userId);
+        deletePairAndLetPartnerKnow();
+    });
+
+    socket.on('get-next-stranger', () => {
+        deletePairAndLetPartnerKnow();
+        sendNewStrangerToThisClient();
+    });
+
     socket.on('send-offer', (data) => {
         console.log(`Sending an offer from ${userId} to ${data.recipientId}.`);
 
@@ -166,6 +241,12 @@ io.on('connection', (socket) => {
         activeUsers[userId].rooms.forEach((roomId) => {
             rooms[roomId].roomies = rooms[roomId].roomies.filter(id => id !== userId);
         });
+
+        // remove from meet-stranger room
+        socket.leave('meet-stranger');
+        meetStrangerRoom = meetStrangerRoom.filter(id => id !== userId);
+        deletePairAndLetPartnerKnow();
+
         // send to all contacts in all rooms that this client was connected
         // that this client is now disconnected
         activeUsers[userId].rooms.forEach((roomId) => {

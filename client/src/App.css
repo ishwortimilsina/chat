@@ -1,8 +1,9 @@
 .App {
     text-align: justify;
-    background-color: #eefffd;
+    background-color: #e8edec;
     font-family: Segoe UI Historic, Segoe UI, Helvetica, Arial, sans-serif;
     color: #923107;
+    height: 100vh;
 }
 
 .App-link {

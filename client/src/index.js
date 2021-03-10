@@ -10,7 +10,7 @@ import reportWebVitals from './reportWebVitals';
 import rootReducer from './store/reducers';
 
 export const appStore = createStore(rootReducer, applyMiddleware(ReduxThunk));
-
+window.appStore = appStore;
 ReactDOM.render(
     <React.StrictMode>
         <Provider store={appStore}>

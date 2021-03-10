@@ -9,6 +9,8 @@ export const ADD_CONTACT = 'contact:add';
 export const REMOVE_CONTACT = 'contact:remove';
 export const CLEAR_CONTACTS = 'contact:clear';
 
+export const PEER_READY = 'peer:ready';
+
 export const SEND_MESSAGE = 'message:send';
 export const RECEIVE_MESSAGE = 'message:receive';
 

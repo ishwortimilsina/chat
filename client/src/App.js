@@ -9,6 +9,7 @@ import Home from './components/Landing/Home';
 import LoginForm from './components/Landing/LoginForm';
 import Room from './components/Room';
 import { generateRandomString } from './utils/utils';
+import MeetStranger from './components/MeetStranger';
 
 
 function App({ status }) {
@@ -30,7 +31,9 @@ function App({ status }) {
                     status.connected
                         ? location === "/"
                             ? <Home />
-                            : <Room />
+                            : location === '/meet-stranger'
+                                ? <MeetStranger />
+                                : <Room />
                         : <LoginForm userName="Ishwor Timilsina" userId="some-random-id" />
                 }
             </div>
