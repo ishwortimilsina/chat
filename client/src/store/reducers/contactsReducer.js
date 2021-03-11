@@ -11,7 +11,7 @@ export function contactsReducer(state=initialState, action) {
         } case ADD_CONTACT: {
             return {
                 ...state,
-                [action.contact.userId]: action.contact
+                [action.contact.userId]: { ...action.contact, connInitiator: action.connInitiator }
             };
         } case REMOVE_CONTACT: {
             const newState = { ...state };

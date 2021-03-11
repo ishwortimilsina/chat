@@ -119,7 +119,7 @@ async function handleOffer(offer, type, offererId) {
 
 export async function videoCallUser(recipientId) {
     try {
-        console.log('Initiating the video call session.');
+        console.log('Initiating the video call session with ' + recipientId);
         appStore.dispatch({ type: START_VIDEO_CALL, otherUser: recipientId });
 
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });

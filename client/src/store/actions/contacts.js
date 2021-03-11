@@ -14,7 +14,8 @@ export function initiateSocketsForContactsHandling(newSocket) {
         appStore.dispatch({
             type: ADD_CONTACT,
             roomId: data.roomId,
-            contact: data.contact
+            contact: data.contact,
+            connInitiator: data.connInitiator
         });
     });
 

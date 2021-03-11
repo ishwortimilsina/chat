@@ -1,9 +1,9 @@
 import { useRef, useEffect } from 'react';
 
-import { leaveChat, peerConnections } from '../../store/actions';
+import { leaveChat, peerConnections, endAudioVideoCall } from '../../store/actions';
 import EndCallIcon from '../common/icons/EndCallIcon';
 
-export default function VideoCallOngoing({ videoCall, endAudioVideoCall }) {
+export default function VideoCallOngoing({ videoCall }) {
     const localVideoRef = useRef();
     const remoteVideoRef = useRef();
 

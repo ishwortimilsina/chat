@@ -1,16 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
+import { videoCallUser } from '../../store/actions/audioVideoCall';
 import { getNextStranger, joinMeetStrangerRoom, leaveMeetStrangerRoom } from '../../store/actions/rooms';
 import { delay } from '../../utils/utils';
 import ChatControllers from '../Chatbox/ChatControllers';
 import MessageContainer from '../Chatbox/MessageContainer';
+import VideoCallOngoing from '../Chatbox/VideoCallOngoing';
 import FastForwardIcon from '../common/icons/FastForwardIcon';
 import LoadingIcon from '../common/icons/LoadingIcon';
 import './MeetStranger.css';
 
-function MeetStranger({ strangerId }) {
+function MeetStranger({ stranger, videoCall }) {
+    const strangerId = stranger && stranger.userId;
     const [isChecking, setIsChecking] = useState(false);
     const retryNextStranger = useRef(null);
+    const partner = useRef(strangerId);
 
     useEffect(() => {
         (async function joiningRoom() {
@@ -30,8 +34,12 @@ function MeetStranger({ strangerId }) {
             retryNextStranger.current && clearInterval(retryNextStranger.current);
         }
 
+        if (strangerId && partner.current !== strangerId && stranger.connInitiator) {
+            videoCallUser(strangerId);
+        }
+
         return () => retryNextStranger.current && clearInterval(retryNextStranger.current);
-    }, [strangerId])
+    }, [strangerId, stranger.connInitiator])
 
     const nextUser = () => {
         if (strangerId) {
@@ -55,13 +63,11 @@ function MeetStranger({ strangerId }) {
                 ) : (
                     <div className="meet-stranger-main-container">
                         <div className="meet-stranger-video-area">
-                            <video
-                                className="meet-stranger-video"
-                                src="https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4"
-                                poster="https://peach.blender.org/wp-content/uploads/title_anouncement.jpg?x11217"
-                                controls
-                            >
-                            </video>
+                            {
+                                strangerId && videoCall.ongoing
+                                ? <VideoCallOngoing videoCall={videoCall} />
+                                : <div className="placeholder-video-poster">Loading peer's video...</div>
+                            }
                         </div>
                         <div className="meet-stranger-text-chat-area">
                             <div className="text-chat-title">
@@ -92,7 +98,8 @@ function MeetStranger({ strangerId }) {
 const mapStateToProps = (state) => {
     const contacts = Object.values(state.contacts);
     return {
-        strangerId: contacts[0] && contacts[0].userId
+        stranger: contacts[0] || {},
+        videoCall: state.videoCall
     }
 };
 

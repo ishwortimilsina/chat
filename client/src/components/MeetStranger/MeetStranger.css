@@ -11,6 +11,7 @@
     padding: 50px;
     width: 100%;
     flex: 1;
+    overflow: hidden;
 }
 
 .meet-stranger-page-loading {
@@ -81,4 +82,29 @@
 
 .text-chat-title  .room-leave-button:active {
     background: #8891aa;
+}
+
+.placeholder-video-poster {
+    background-color: black;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: lightgrey;
+    font-size: 2em;
+}
+
+.meet-stranger-video-area .remote-video-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+}
+
+.meet-stranger-video-area .remote-video {
+    width: 100%;
+    min-width: 200px;
+    object-fit: cover;
+    height: 100%;
 }
