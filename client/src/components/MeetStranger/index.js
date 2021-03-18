@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
-import { videoCallUser } from '../../store/actions/audioVideoCall';
+import { useLocation } from 'wouter';
+import { endAudioVideoCall, leaveChat, videoCallUser } from '../../store/actions/audioVideoCall';
 import { getNextStranger, joinMeetStrangerRoom, leaveMeetStrangerRoom } from '../../store/actions/rooms';
 import { delay } from '../../utils/utils';
 import ChatControllers from '../Chatbox/ChatControllers';
@@ -12,6 +13,7 @@ import './MeetStranger.css';
 
 function MeetStranger({ stranger, videoCall }) {
     const strangerId = stranger && stranger.userId;
+    const [, setLocation] = useLocation();
     const [isChecking, setIsChecking] = useState(false);
     const retryNextStranger = useRef(null);
     const partner = useRef(strangerId);
@@ -47,11 +49,20 @@ function MeetStranger({ stranger, videoCall }) {
         }
     };
 
+    const handleLeaveRoom = () => {
+        if (videoCall && videoCall.otherUser) {
+            endAudioVideoCall(videoCall.otherUser, 'video');
+            leaveChat(videoCall.otherUser, 'video');
+        }
+        leaveMeetStrangerRoom();
+        setLocation('/');
+    }
+
     return (
         <div className="meet-stranger-container">
             <div className="room-title">
                 <div className="room-name">Meet Stranger</div>
-                <div className="room-leave-button" onClick={leaveMeetStrangerRoom}>
+                <div className="room-leave-button" onClick={handleLeaveRoom}>
                     Leave Room
                 </div>
             </div>
@@ -65,7 +76,7 @@ function MeetStranger({ stranger, videoCall }) {
                         <div className="meet-stranger-video-area">
                             {
                                 strangerId && videoCall.ongoing
-                                ? <VideoCallOngoing videoCall={videoCall} />
+                                ? <VideoCallOngoing videoCall={videoCall} hideEndCall={true} />
                                 : <div className="placeholder-video-poster">Loading peer's video...</div>
                             }
                         </div>

@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import DoorOpenIcon from "../common/icons/DoorOpenIcon";
 import FileTransferIcon from "../common/icons/FileTransferIcon";
 import FilmIcon from "../common/icons/FilmIcon";
 import HomeIcon from "../common/icons/HomeIcon";
+import SpyIcon from "../common/icons/SpyIcon";
 import VideoRecordIcon from "../common/icons/VideoRecordIcon";
 import CreateRoom from "../Room/CreateRoom";
 import JoinRoom from "../Room/JoinRoom";
@@ -29,6 +31,10 @@ export default function Home(props) {
                                     <DoorOpenIcon className="home-menu-icon" tooltip="Join Room" />
                                     <div className="home-menu-item-text">Join Room</div>
                                 </div>
+                                <Link className="home-menu-item" href="/meet-stranger">
+                                    <SpyIcon className="home-menu-icon" tooltip="Meet Random People" />
+                                    <div className="home-menu-item-text">Meet Random</div>
+                                </Link>
                                 <div className="home-menu-item disable">
                                     <VideoRecordIcon className="home-menu-icon" tooltip="Record Video" />
                                     <div className="home-menu-item-text">Record Video</div>
