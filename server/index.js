@@ -31,7 +31,7 @@ io.on('connection', (socket) => {
         console.log(`Client ${userId} with socket id ${socket.id} disconnected.`);
         
         handleMeetStrangerRemoval(userId, socket, io);
-        removeUserFromAllRooms(userId);
+        removeUserFromAllRooms(userId, io);
         
         delete activeUsers[userId];
     });

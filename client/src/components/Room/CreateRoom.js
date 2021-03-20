@@ -25,7 +25,7 @@ export default function CreateRoom({ goBack }) {
         if (success) {
             setRoomId(roomId);
             setFailureMsg('');
-            setRoomLink(`${window.location.hostname}/${roomId}`);
+            setRoomLink(`${window.location.hostname}${window.location.port ? ':'+window.location.port : ''}/${roomId}`);
         } else {
             setRoomId('');
             setFailureMsg(msg);

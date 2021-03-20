@@ -2,7 +2,7 @@ const { activeUsers, rooms } = require('./data');
 const { sendAllActiveContactsToThisClient, sendThisContactActivenessToAllOtherClients } = require('../utils/contactUtils');
 const { generateRandomString } = require('../utils/utils');
 
-function removeUserFromAllRooms(userId) {
+function removeUserFromAllRooms(userId, io) {
     // remove this user from all rooms
     activeUsers[userId].rooms.forEach((roomId) => {
         rooms[roomId].roomies = rooms[roomId].roomies.filter(id => id !== userId);
@@ -11,7 +11,7 @@ function removeUserFromAllRooms(userId) {
     // send to all contacts in all rooms that this client was connected
     // that this client is now disconnected
     activeUsers[userId].rooms.forEach((roomId) => {
-        sendThisContactActivenessToAllOtherClients(false, roomId);
+        sendThisContactActivenessToAllOtherClients(false, roomId, userId, io);
     });
 }
 
