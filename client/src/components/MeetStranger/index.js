@@ -45,7 +45,7 @@ function MeetStranger({ stranger, videoCall }) {
 
     const nextUser = () => {
         if (strangerId) {
-            getNextStranger();
+            getNextStranger(strangerId);
         }
     };
 

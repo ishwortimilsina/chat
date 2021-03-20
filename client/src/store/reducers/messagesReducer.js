@@ -23,7 +23,6 @@ export function messagesReducer(state=initialState, action) {
             };
         }
         case SEND_MESSAGE: {
-            console.log(action)
             return {
                 ...state,
                 [action.roomId]: {

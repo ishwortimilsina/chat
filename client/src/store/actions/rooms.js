@@ -1,16 +1,15 @@
 import { appStore } from '../..';
 import { JOIN_ROOM, LEAVE_ROOM, REMOVE_CONTACT } from './actionTypes';
+import { endAudioVideoCall, leaveChat } from './audioVideoCall';
 
 let newSocket;
 
 export function initializeSocketForRooms(currentSocket) {
     newSocket = currentSocket;
 
-    if (newSocket) {
-        newSocket.on('stranger-left', ({ strangerId }) => {
-            getNextStranger(strangerId);
-        });
-    }
+    newSocket.on('stranger-left', ({ strangerId }) => {
+        getNextStranger(strangerId);
+    });
 }
 
 export async function checkRoomExists(roomId) {
@@ -114,6 +113,9 @@ export function getNextStranger(strangerId) {
         roomId: 'meet-stranger',
         contact: { userId: strangerId }
     });
+    endAudioVideoCall(strangerId, 'video');
+    leaveChat(strangerId, 'video');
+
     if (newSocket) {
         newSocket.emit('get-next-stranger', { strangerId });
     }

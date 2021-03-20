@@ -5,7 +5,6 @@ function deletePairAndLetPartnerKnow(userId, io) {
     const partner = strangerPairs.get(userId);
     strangerPairs.delete(userId);
     if (partner) {
-        strangerPairs.delete(partner);
         // tell the other user (stranger) to remove this user and get another one
         if (activeUsers[partner]) {
             io.to(activeUsers[partner].socketId).emit('stranger-left', { strangerId: userId });
@@ -21,7 +20,7 @@ function handleMeetStrangerRemoval(userId, socket, io) {
 }
 
 function handleMeetStranger(userId, socket, io) {
-    async function sendNewStrangerToThisClient() {
+    async function sendNewStrangerToThisClient(currPartner) {
         const getRandomIndex = () => Math.floor(Math.random() * meetStrangerRoom.size);
 
         if (meetStrangerRoom.size > 1) {
@@ -32,18 +31,16 @@ function handleMeetStranger(userId, socket, io) {
             while (
                 triesToFindStranger < 100 &&
                 meetStrangerRoomArr[randomIndex] === userId &&
-                activeUsers[meetStrangerRoomArr[randomIndex]] &&
                 !strangerPairs.has(meetStrangerRoomArr[randomIndex])
             ) {
+                triesToFindStranger++;
                 randomIndex = getRandomIndex();
             }
 
-            if (
-                meetStrangerRoomArr[randomIndex] !== userId &&
-                activeUsers[meetStrangerRoomArr[randomIndex]] &&
-                !strangerPairs.has(meetStrangerRoomArr[randomIndex])
-            ) {
-                const chosenContact =  _.omit(activeUsers[meetStrangerRoomArr[randomIndex]], ['socketId', 'rooms']);
+            const partner = meetStrangerRoomArr[randomIndex];
+
+            if (partner !== userId && partner !== currPartner && activeUsers[partner] && !strangerPairs.has(partner)) {
+                const chosenContact =  _.omit(activeUsers[partner], ['socketId', 'rooms']);
                 if (chosenContact) {
                     // send this new stranger's contact to self
                     strangerPairs.set(userId, chosenContact.userId);
@@ -55,11 +52,11 @@ function handleMeetStranger(userId, socket, io) {
 
                     // send self's contact to this stranger
                     strangerPairs.set(chosenContact.userId, userId);
-                    io.to(activeUsers[meetStrangerRoomArr[randomIndex]].socketId).emit('new-contact', {
+                    io.to(activeUsers[partner].socketId).emit('new-contact', {
                         roomId: "meet-stranger",
                         contact: _.omit(activeUsers[userId], ['socketId', 'rooms'])
                     });
-                    return meetStrangerRoomArr[randomIndex];
+                    return partner;
                 }
             }
         }
@@ -77,12 +74,13 @@ function handleMeetStranger(userId, socket, io) {
     socket.on('leave-meet-stranger-room', () => {
         socket.leave('meet-stranger');
         meetStrangerRoom.delete(userId);
-        deletePairAndLetPartnerKnow();
+        deletePairAndLetPartnerKnow(userId, io);
     });
 
     socket.on('get-next-stranger', () => {
-        deletePairAndLetPartnerKnow();
-        sendNewStrangerToThisClient();
+        const partner = strangerPairs.get(userId);
+        deletePairAndLetPartnerKnow(userId, io);
+        sendNewStrangerToThisClient(partner);
     });
 
 }

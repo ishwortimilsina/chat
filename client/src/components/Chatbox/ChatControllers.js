@@ -11,12 +11,6 @@ function ChatControllers(props) {
     const onSendClick = (e) => {
         e.preventDefault();
         if (props.selectedContact && text) {
-            console.log({
-                recipient: props.selectedContact,
-                roomId: props.roomId,
-                text,
-                sender: cred.userId
-            })
             props.sendMessage({
                 recipient: props.selectedContact,
                 roomId: props.roomId,
