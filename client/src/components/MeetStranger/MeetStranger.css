@@ -1,14 +1,14 @@
 .meet-stranger-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: calc(100% - 50px);
     justify-content: center;
     align-items: center;
 }
 
 .meet-stranger-main-container {
     display: flex;
-    padding: 50px;
+    padding: 30px 50px;
     width: 100%;
     flex: 1;
     overflow: hidden;
@@ -22,7 +22,7 @@
 }
 
 .meet-stranger-video-area {
-    flex: 2;
+    flex: 1;
     display: flex;
 }
 

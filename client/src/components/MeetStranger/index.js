@@ -1,19 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
-import { useLocation } from 'wouter';
-import { endAudioVideoCall, leaveChat, videoCallUser } from '../../store/actions/audioVideoCall';
-import { getNextStranger, joinMeetStrangerRoom, leaveMeetStrangerRoom } from '../../store/actions/rooms';
+import { videoCallUser } from '../../store/actions/audioVideoCall';
+import { getNextStranger, joinMeetStrangerRoom } from '../../store/actions/rooms';
 import { delay } from '../../utils/utils';
 import ChatControllers from '../Chatbox/ChatControllers';
 import MessageContainer from '../Chatbox/MessageContainer';
 import VideoCallOngoing from '../Chatbox/VideoCallOngoing';
+import LeaveRoomButton from '../common/components/LeaveRoomButton';
 import FastForwardIcon from '../common/icons/FastForwardIcon';
 import LoadingIcon from '../common/icons/LoadingIcon';
 import './MeetStranger.css';
 
 function MeetStranger({ stranger, videoCall }) {
     const strangerId = stranger && stranger.userId;
-    const [, setLocation] = useLocation();
     const [isChecking, setIsChecking] = useState(false);
     const retryNextStranger = useRef(null);
     const partner = useRef(strangerId);
@@ -49,23 +48,9 @@ function MeetStranger({ stranger, videoCall }) {
         }
     };
 
-    const handleLeaveRoom = () => {
-        if (videoCall && videoCall.otherUser) {
-            endAudioVideoCall(videoCall.otherUser, 'video');
-            leaveChat(videoCall.otherUser, 'video');
-        }
-        leaveMeetStrangerRoom();
-        setLocation('/');
-    }
-
     return (
         <div className="meet-stranger-container">
-            <div className="room-title">
-                <div className="room-name">Meet Stranger</div>
-                <div className="room-leave-button" onClick={handleLeaveRoom}>
-                    Leave Room
-                </div>
-            </div>
+            <LeaveRoomButton otherUser={videoCall.otherUser} roomId="meet-stranger" />
             {
                 isChecking ? (
                     <div className="meet-stranger-page-loading">

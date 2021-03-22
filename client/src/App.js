@@ -27,6 +27,23 @@ function App({ status }) {
     return (
         <AppContext.Provider value={{ ...cred, status }}>
             <div className="App">
+                <div className="site-navbar">
+                    <div className="site-navbar-left">
+                        <img className="site-logo" src="/favicon.ico" alt="site-logo" />
+                        <div className="site-name">Kurakani</div>
+                    </div>
+                    <div className="site-navbar-middle">
+                        {
+                            location === "/"
+                                ? "Meet strangers, create and join rooms to text chats and audio/video calls, share files with your friends, and more."
+                                : location === '/meet-stranger'
+                                    ? <span className="room-name">Meet Stranger</span>
+                                    : <span className="room-name">Meet</span>
+                        }
+                        
+                    </div>
+                    <div className="site-navbar-right" id="for-leave-room-button"></div>
+                </div>
                 {
                     status.connected
                         ? location === "/"

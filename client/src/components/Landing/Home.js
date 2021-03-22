@@ -33,7 +33,7 @@ export default function Home(props) {
                                 </div>
                                 <Link className="home-menu-item" href="/meet-stranger">
                                     <SpyIcon className="home-menu-icon" tooltip="Meet Random People" />
-                                    <div className="home-menu-item-text">Meet Random</div>
+                                    <div className="home-menu-item-text">Meet Stranger</div>
                                 </Link>
                                 <div className="home-menu-item disable">
                                     <VideoRecordIcon className="home-menu-icon" tooltip="Record Video" />

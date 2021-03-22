@@ -95,13 +95,16 @@ export async function joinMeetStrangerRoom() {
     });
 }
 
-export async function leaveMeetStrangerRoom() {
+export async function leaveMeetStrangerRoom(strangerId) {
+    appStore.dispatch({
+        type: LEAVE_ROOM,
+        roomId: 'meet-stranger'
+    });
+    endAudioVideoCall(strangerId, 'video');
+    leaveChat(strangerId, 'video');
+
     if (newSocket) {
         newSocket.emit('leave-meet-stranger-room');
-        appStore.dispatch({
-            type: LEAVE_ROOM,
-            roomId: 'meet-stranger'
-        });
     }
 }
 
