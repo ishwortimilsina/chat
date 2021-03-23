@@ -6,13 +6,14 @@ import './App.css';
 
 import { AppContext } from './contexts/AppContext';
 import Home from './components/Landing/Home';
-import LoginForm from './components/Landing/LoginForm';
 import Room from './components/Room';
 import { generateRandomString } from './utils/utils';
 import MeetStranger from './components/MeetStranger';
+import { establishConnection } from './store/actions';
+import LoadingIcon from './components/common/icons/LoadingIcon';
 
 
-function App({ status }) {
+function App({ status, establishConnection }) {
     const [cred, setCred] = useState({});
     const [location] = useLocation();
 
@@ -21,8 +22,10 @@ function App({ status }) {
         const localChatIdentity = JSON.parse(localStorage.getItem('chat-identity'));
         const userName = localChatIdentity && localChatIdentity.userName;
 
+        establishConnection(userId);
+
         setCred({ userId, userName });
-    }, []);
+    }, [establishConnection]);
 
     return (
         <AppContext.Provider value={{ ...cred, status }}>
@@ -51,7 +54,11 @@ function App({ status }) {
                             : location === '/meet-stranger'
                                 ? <MeetStranger />
                                 : <Room />
-                        : <LoginForm userName="Ishwor Timilsina" userId="some-random-id" />
+                        : (
+                            <div className="page-loading-container">
+                                <LoadingIcon style={{ height: 180, width: 180 }} />
+                            </div>
+                        )
                 }
             </div>
         </AppContext.Provider>
@@ -62,4 +69,4 @@ const mapStateToProps = (state) => ({
     status: state.status
 });
 
-export default connect(mapStateToProps)(App);
+export default connect(mapStateToProps, { establishConnection })(App);

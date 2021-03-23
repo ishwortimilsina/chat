@@ -76,6 +76,19 @@ export async function leaveRoom({ roomId }) {
     });
 }
 
+export async function addUserName(userName) {
+    const _this = {};
+    return new Promise((resolve) => {
+        if (newSocket) {
+            newSocket.emit('add-user-name', { userName });
+            _this.res = newSocket.on('add-user-name', () => {
+                resolve(true);
+                _this.res = null;
+            });
+        }
+    });
+}
+
 export async function joinMeetStrangerRoom() {
     const _this = {};
     return new Promise((resolve) => {

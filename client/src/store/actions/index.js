@@ -3,4 +3,4 @@ export { sendCallRequest, endAudioVideoCall, acceptAudioVideoCall, rejectAudioVi
 export { requestShareFile, leaveFileSharing, endFileSharing, acceptShareFile, rejectShareFile, openFileSharingWidget } from './shareFile';
 export { sendMessage } from './dataConnection';
 export { peerConnections } from './connections';
-export { checkRoomExists, createRoom, joinRoom } from './rooms';
+export { checkRoomExists, createRoom, joinRoom, addUserName } from './rooms';

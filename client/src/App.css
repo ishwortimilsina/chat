@@ -61,3 +61,10 @@
 .site-navbar-right {
     font-size: 1.4em;
 }
+
+.page-loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100% - 50px);
+}

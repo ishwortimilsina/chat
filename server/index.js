@@ -18,10 +18,15 @@ io.on('connection', (socket) => {
     activeUsers[userId] = {
         socketId: socket.id,
         userId,
-        userName: socket.handshake.query.name,
+        userName: "",
         rooms: [],
         isActive: true
     };
+
+    socket.on('add-user-name', ({ userName }) => {
+        activeUsers[userId].userName = userName;
+        socket.emit('add-user-name');
+    });
 
     handleWebRtcSignaling(userId, socket, io);
     handleRooms(userId, socket, io);

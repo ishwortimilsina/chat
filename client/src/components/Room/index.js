@@ -6,11 +6,13 @@ import { joinRoom } from '../../store/actions';
 import { delay } from '../../utils/utils';
 import Modal from '../common/components/Modal';
 import LoadingIcon from '../common/icons/LoadingIcon';
+import LoginForm from '../Landing/LoginForm';
 import MainContainer from '../MainContainer';
 import './Room.css';
 
 export default function Room() {
     const [ location, setLocation ] = useLocation();
+    const [ isUserNameSet, changeIsUserNameSet ] = useState(false);
     const [ roomName, setRoomName ] = useState('');
     const [ isAvailable, setIsAvailable ] = useState(false);
     const [ isChecking, setIsChecking ] = useState(true);
@@ -18,28 +20,32 @@ export default function Room() {
     const currentRoomId = location.split("?")[0].split("/")[1];
 
     useEffect(() => {
-        (async function joiningRoom() {
-            await delay(1000);
+        if (isUserNameSet) {
+            (async function joiningRoom() {
+                await delay(1000);
 
-            const { roomId, roomName, success } = await joinRoom({ roomId: currentRoomId });
+                const { roomId, roomName, success } = await joinRoom({ roomId: currentRoomId });
 
-            setIsChecking(false);
+                setIsChecking(false);
 
-            if (roomId === currentRoomId && success) {
-                setIsAvailable(success);
-                setRoomName(roomName)
-            } else {
-                await delay(3000);
-                setLocation("/");
-            }
-        })();
-    }, [location, setLocation, currentRoomId]);
+                if (roomId === currentRoomId && success) {
+                    setIsAvailable(success);
+                    setRoomName(roomName)
+                } else {
+                    await delay(3000);
+                    setLocation("/");
+                }
+            })();
+        }
+    }, [isUserNameSet, location, setLocation, currentRoomId]);
 
     return (
         <RoomContext.Provider value={{ roomId: currentRoomId, roomName }}>
             <div className="room-page">
                 {
-                    isChecking ? (
+                    !isUserNameSet ? (
+                        <LoginForm changeIsUserNameSet={changeIsUserNameSet} />
+                    ) : isChecking ? (
                         <div className="page-loading">
                             <LoadingIcon style={{ height: 180, width: 180 }} />
                         </div>
