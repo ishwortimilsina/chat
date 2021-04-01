@@ -10,9 +10,9 @@ import LoadingIcon from '../common/icons/LoadingIcon';
 
 import './Room.css';
 
-export default function CreateRoom({ goBack }) {
+export default function CreateRoom({ goBack, roomType }) {
     const [ location, setLocation ] = useLocation();
-    const [ roomName, setRoomName ] = useState('');
+    const [ roomName, setRoomName ] = useState(roomType === "meet" ? "" : "Share Files");
     const [ roomId, setRoomId ] = useState('');
     const [ isSubmitting, setIsSubmitting ] = useState(false);
     const [ roomLink, setRoomLink ] = useState('');
@@ -21,11 +21,11 @@ export default function CreateRoom({ goBack }) {
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
-        const { roomId, success, msg } = await createRoom({ roomName })
+        const { roomId, success, msg } = await createRoom({ roomName, roomType })
         if (success) {
             setRoomId(roomId);
             setFailureMsg('');
-            setRoomLink(`${window.location.hostname}${window.location.port ? ':'+window.location.port : ''}/${roomId}`);
+            setRoomLink(`${window.location.hostname}${window.location.port ? ':'+window.location.port : ''}/${roomType}/${roomId}`);
         } else {
             setRoomId('');
             setFailureMsg(msg);
@@ -47,8 +47,7 @@ export default function CreateRoom({ goBack }) {
 
     const handleJoin = () => {
         if (roomId) {
-            console.log("Joining the meeting.");
-            setLocation(`/${roomId}`);
+            setLocation(`/${roomType}/${roomId}`);
         }
     }
 
@@ -69,7 +68,7 @@ export default function CreateRoom({ goBack }) {
                     value={roomName || ''}
                     onChange={({ target }) => setRoomName(target.value)}
                     placeholder="Room Name"
-                    disabled={isSubmitting || roomId}
+                    disabled={isSubmitting || roomId || roomType !== "meet"}
                 />
                 <label>Room ID</label>
                 <input

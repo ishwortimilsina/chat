@@ -19,8 +19,9 @@ export default function Home(props) {
             <div className="landing-home">
                 <div className="home-menu-container">
                     {
-                        selectedMenu === 'create-room' ? <CreateRoom goBack={() => selectMenu('')} />
+                        selectedMenu === 'create-room' ? <CreateRoom roomType="meet" goBack={() => selectMenu('')} />
                         : selectedMenu === 'join-room' ? <JoinRoom goBack={() => selectMenu('')} />
+                        : selectedMenu === 'share-files' ? <CreateRoom roomType="share-files" goBack={() => selectMenu('')} />
                         : (
                             <>
                                 <div className="home-menu-item" onClick={() => selectMenu('create-room')}>
@@ -35,13 +36,13 @@ export default function Home(props) {
                                     <SpyIcon className="home-menu-icon" tooltip="Meet Random People" />
                                     <div className="home-menu-item-text">Meet Stranger</div>
                                 </Link>
+                                <div className="home-menu-item" onClick={() => selectMenu('share-files')}>
+                                    <FileTransferIcon className="home-menu-icon" tooltip="Transfer Files" />
+                                    <div className="home-menu-item-text">Share Files</div>
+                                </div>
                                 <div className="home-menu-item disable">
                                     <VideoRecordIcon className="home-menu-icon" tooltip="Record Video" />
                                     <div className="home-menu-item-text">Record Video</div>
-                                </div>
-                                <div className="home-menu-item disable">
-                                    <FileTransferIcon className="home-menu-icon" tooltip="Transfer Files" />
-                                    <div className="home-menu-item-text">Transfer Files</div>
                                 </div>
                                 <div className="home-menu-item disable">
                                     <FilmIcon className="home-menu-icon" tooltip="Watch Along Videos" />

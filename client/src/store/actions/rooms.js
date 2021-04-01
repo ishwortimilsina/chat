@@ -25,11 +25,11 @@ export async function checkRoomExists(roomId) {
     });
 }
 
-export async function createRoom({ roomName }) {
+export async function createRoom({ roomName, roomType }) {
     const _this = {};
     return new Promise((resolve) => {
         if (newSocket) {
-            newSocket.emit('create-room', { roomName });
+            newSocket.emit('create-room', { roomName, roomType });
             _this.res = newSocket.on('create-room', ({ roomId, success, msg }) => {
                 resolve({ roomId, success, msg });
                 _this.res = null;
@@ -38,11 +38,11 @@ export async function createRoom({ roomName }) {
     });
 }
 
-export async function joinRoom({ roomId }) {
+export async function joinRoom({ roomId, roomType }) {
     const _this = {};
     return new Promise((resolve) => {
         if (newSocket) {
-            newSocket.emit('join-room', { roomId });
+            newSocket.emit('join-room', { roomId, roomType });
             _this.res = newSocket.on('join-room', ({ roomId, roomName, success, msg }) => {
                 if (success) {
                     appStore.dispatch({

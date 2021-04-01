@@ -16,7 +16,7 @@ function removeUserFromAllRooms(userId, io) {
 }
 
 function handleRooms(userId, socket, io) {
-    socket.on('create-room', ({ roomName  }) => {
+    socket.on('create-room', ({ roomName, roomType  }) => {
         let roomId = generateRandomString().toLowerCase();
         while (rooms[roomId]) {
             roomId = generateRandomString();
@@ -25,6 +25,7 @@ function handleRooms(userId, socket, io) {
         rooms[roomId] = {
             roomId,
             roomName,
+            roomType: roomType || 'meet',
             roomies: [],
             isActive: false
         };
@@ -34,15 +35,26 @@ function handleRooms(userId, socket, io) {
         });
     });
 
-    socket.on('check-room-availability', ({ roomId }) => {
+    function checkRoomAvailability(roomId, roomType) {
+        if (rooms[roomId] && rooms[roomId].roomType === roomType) {
+            if (roomType === "share-files") {
+                if (rooms[roomId].roomies.length < 2) return true;
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
+    socket.on('check-room-availability', ({ roomId, roomType }) => {
         io.to(socket.id).emit('room-availability', {
             roomId,
-            isAvailable: !!rooms[roomId]
+            isAvailable: checkRoomAvailability(roomId, roomType)
         });
     });
 
-    socket.on('join-room', ({ roomId }) => {
-        if (!rooms[roomId]) {
+    socket.on('join-room', ({ roomId, roomType }) => {
+        if (!checkRoomAvailability(roomId, roomType)) {
             io.to(socket.id).emit('join-room', {
                 roomId,
                 success: false,

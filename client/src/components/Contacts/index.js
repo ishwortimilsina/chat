@@ -12,7 +12,7 @@ function Contacts({ contacts, selectedContact, selectContact }) {
         <div className="contacts">
             <div className="contacts-title">
                 <div className="contacts-title-title">
-                    <img src="favicon.ico" alt="Profile" className="contacts-title-img" />
+                    <img src="/favicon.ico" alt="Profile" className="contacts-title-img" />
                     <div>Chats</div>
                 </div>
                 <SearchContacts searchTerm={searchTerm} setSearchTerm={setSearchTerm} />

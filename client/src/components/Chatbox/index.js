@@ -30,7 +30,7 @@ function Chatbox({ selectedContact, selectedContactName, selectContact, sendCall
                     { selectedContact ? (
                         <>
                             <div className="contact-list-item-img-container">
-                                <img className="contact-list-item-img" src='favicon.ico' alt={selectedContactName} />
+                                <img className="contact-list-item-img" src='/favicon.ico' alt={selectedContactName} />
                             </div>
                             <div className="contact-list-item-details">
                                 <div className="chat-title-name">{selectedContactName}</div>

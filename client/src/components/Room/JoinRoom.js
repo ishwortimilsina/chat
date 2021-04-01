@@ -13,7 +13,7 @@ export default function JoinRoom({ goBack }) {
 
     const handleRoomIdChange = ({ target }) => {
         setRoomId(target.value);
-        const roomLink = `${window.location.hostname}${window.location.port ? ':'+window.location.port : ''}/${target.value}`;
+        const roomLink = `${window.location.hostname}${window.location.port ? ':'+window.location.port : ''}/meet/${target.value}`;
         setRoomLink(roomLink);
     };
 
