@@ -9,7 +9,7 @@ export function establishConnection(id, name) {
     return async (dispatch) => {
         try {
             newSocket = await io(
-                'http://localhost:3001',
+                `${window.location.origin}`,
                 {
                     query: { id, name },
                     transports: ["websocket"]
