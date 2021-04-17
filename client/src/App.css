@@ -15,29 +15,29 @@
 
 .site-navbar {
     display: flex;
-    padding: 5px 20px;
+    flex-direction: column;
+    padding: 5px 5px;
     background-color: black;
     color: #cccccc;
 }
 
 .site-navbar-left {
     display: flex;
-    margin-right: 30px;
-    justify-content: center;
+    flex-direction: row;
     align-items: center;
 }
 
 .site-logo {
-    height: 40px;
-    width: 40px;
+    height: 30px;
+    width: 30px;
     border-radius: 50%;
     margin-right: 10px;
 }
 
 .site-name {
-    font-size: 1.2em;
+    font-size: 1em;
     font-weight: 800;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.15em;
     cursor: pointer;
 }
 
@@ -45,21 +45,65 @@
     color: white;
 }
 
+.site-navbar-main {
+    display: flex;
+    justify-content: space-between;
+    flex: 1;
+}
+
 .site-navbar-middle {
     display: flex;
     flex: 1;
-    justify-content: center;
     align-items: center;
 }
 
 .site-navbar-middle>.room-name {
     font-weight: bold;
-    font-size: 1.5em;
-    letter-spacing: 0.1em;
+    font-size: 1.2em;
 }
 
 .site-navbar-right {
-    font-size: 1.4em;
+    font-size: 1.2em;
+}
+
+@media screen and (min-width: 480px) {
+    .site-navbar {
+        flex-direction: row;
+        padding: 5px 20px;
+    }
+
+    .site-navbar-left {
+        flex-direction: row;
+        margin-right: 30px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .site-logo {
+        height: 40px;
+        width: 40px;
+    }
+    
+    .site-name {
+        font-size: 1.2em;
+        letter-spacing: 0.2em;
+    }
+    
+    .site-navbar-middle {
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .site-navbar-middle>.room-name {
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+    
+    .site-navbar-right {
+        font-size: 1.4em;
+    }
 }
 
 .page-loading-container {

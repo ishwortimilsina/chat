@@ -39,19 +39,21 @@ function App({ status, establishConnection }) {
                         <img className="site-logo" src="/favicon.ico" alt="site-logo" />
                         <div className="site-name">Kurakani</div>
                     </div>
-                    <div className="site-navbar-middle">
-                        {
-                            location === '/meet-stranger'
-                            ? <span className="room-name">Meet Stranger</span>
-                            : meetRoom[0]
-                                ? <span className="room-name">Meet</span>
-                                : shareFilesRoom[0]
-                                    ? <span className="room-name">Share Files</span>
-                                    : "Meet strangers, create and join rooms for text chats and audio/video calls, share files with your friends, and more."
-                        }
-                        
+                    <div className="site-navbar-main">
+                        <div className="site-navbar-middle">
+                            {
+                                location === '/meet-stranger'
+                                ? <span className="room-name">Meet Stranger</span>
+                                : meetRoom[0]
+                                    ? <span className="room-name">Meet</span>
+                                    : shareFilesRoom[0]
+                                        ? <span className="room-name">Share Files</span>
+                                        : "Meet strangers, create and join rooms for text chats and audio/video calls, share files with your friends, and more."
+                            }
+                            
+                        </div>
+                        <div className="site-navbar-right" id="for-leave-room-button"></div>
                     </div>
-                    <div className="site-navbar-right" id="for-leave-room-button"></div>
                 </div>
                 {
                     status.connected
