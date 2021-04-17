@@ -1,14 +1,14 @@
 .meet-stranger-container {
     display: flex;
     flex-direction: column;
-    height: calc(100% - 50px);
     justify-content: center;
     align-items: center;
 }
 
 .meet-stranger-main-container {
     display: flex;
-    padding: 30px 50px;
+    flex-direction: column-reverse;
+    padding: 30px 20px;
     width: 100%;
     flex: 1;
     overflow: hidden;
@@ -27,19 +27,17 @@
 }
 
 .meet-stranger-text-chat-area {
-    flex: 1;
     display: flex;
     flex-direction: column;
     background-color: #e9eaff;
     box-shadow: 3px 2px 10px 1px rgb(0 0 0 / 10%);
+    max-height: 250px;
 }
 
 .meet-stranger-text-chat-area-inner {
-    height: 100%;
     width: 100%;
-    display: flex;
     flex-direction: column;
-    flex: 1;
+    height: calc(100% - 48px);
 }
 
 .meet-stranger-video {
@@ -51,22 +49,21 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 20px;
+    padding: 8px;
     background-color: #606174;
     color: #ffe0e0;
     width: 100%;
 }
 
 .text-chat-title .title-name {
-    font-size: 1.2em;
+    font-size: 0.8em;
     font-weight: bold;
 }
 
 .text-chat-title .room-leave-button {
-    padding: 10px;
+    padding: 6px;
     font-weight: bold;
-    font-size: 0.9em;
-    letter-spacing: 0.05em;
+    font-size: 0.8em;
     border-radius: 5px;
     background-color: #7688b8;
     cursor: pointer;
@@ -86,13 +83,13 @@
 
 .placeholder-video-poster {
     background-color: black;
-    height: 100%;
+    height: 250px;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     color: lightgrey;
-    font-size: 2em;
+    font-size: 1.2em;
 }
 
 .meet-stranger-video-area .remote-video-container {
@@ -100,6 +97,7 @@
     flex-direction: column;
     align-items: center;
     margin: 0;
+    width: 100%;
 }
 
 .meet-stranger-video-area .remote-video {
@@ -107,4 +105,77 @@
     min-width: 200px;
     object-fit: cover;
     height: 100%;
+}
+
+@media screen and (min-width: 1000px) {
+    .meet-stranger-container {
+        height: calc(100% - 50px);
+    }
+
+    .meet-stranger-main-container {
+        flex-direction: row;
+        padding: 30px 50px;
+    }
+
+    .placeholder-video-poster {
+        font-size: 2em;
+        height: 100%;
+    }
+
+    .meet-stranger-text-chat-area {
+        flex: 1;
+        height: auto;
+    }
+
+    .meet-stranger-text-chat-area-inner {
+        height: 100%;
+        display: flex;
+        flex: 1;
+    }
+
+    .text-chat-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 20px;
+        background-color: #606174;
+        color: #ffe0e0;
+        width: 100%;
+    }
+    
+    .text-chat-title .title-name {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+    
+    .text-chat-title .room-leave-button {
+        padding: 10px;
+        font-weight: bold;
+        font-size: 0.9em;
+        letter-spacing: 0.05em;
+        border-radius: 5px;
+        background-color: #7688b8;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+    }
+
+    .meet-stranger-text-chat-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #e9eaff;
+        box-shadow: 3px 2px 10px 1px rgb(0 0 0 / 10%);
+        max-height: none;
+    }
+    
+    .meet-stranger-text-chat-area-inner {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
 }
