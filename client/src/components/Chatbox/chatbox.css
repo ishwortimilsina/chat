@@ -4,6 +4,7 @@
     flex-direction: column;
     flex: 1;
     height: calc(100% - 50px);
+    padding-left: 60px;
 }
 
 .messages-container {
@@ -187,6 +188,10 @@
     left: 45%;
 }
 
+.call-buttons-container {
+    display: flex;
+}
+
 .call-buttons {
     padding: 8px 15px;
     border: solid thin #929eaa;
@@ -365,6 +370,10 @@
 }
 
 @media screen and (min-width: 1000px) {
+    .chatbox {
+        padding-left: 0;
+    }
+
     .actual-videos-container {
         position: relative;
         flex-direction: row;

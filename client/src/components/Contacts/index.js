@@ -5,11 +5,18 @@ import './contacts.css';
 
 import { connect } from 'react-redux';
 import { SearchContacts } from './SearchContacts';
+import ArrowLeftIcon from '../common/icons/ArrowLeftIcon';
 
 function Contacts({ contacts, selectedContact, selectContact }) {
     const [searchTerm, setSearchTerm] = useState('');
+    const [isExpanded, setIsExpanded] = useState(true);
+
+    const handleToggle = () => {
+        setIsExpanded(!isExpanded);
+    };
+
     return (
-        <div className="contacts">
+        <div className={`contacts${isExpanded ? ' expanded': ''}`}>
             <div className="contacts-title">
                 <div className="contacts-title-title">
                     <img src="/favicon.ico" alt="Profile" className="contacts-title-img" />
@@ -24,6 +31,9 @@ function Contacts({ contacts, selectedContact, selectContact }) {
                     key={item.userId}
                     item={item} />
                 )}
+            </div>
+            <div className="toggle-contacts-bar" onClick={handleToggle}>
+                <span className="toggle-contacts-icon">{isExpanded ? '<' : '>'}</span>
             </div>
         </div>
     );

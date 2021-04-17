@@ -1,7 +1,20 @@
 .contacts {
     display: flex;
     flex-direction: column;
+    width: 60px;
+    position: absolute;
+    transition: 0.5s;
+    height: 100%;
+    box-shadow: 1px 0px 5px lightslategrey;
+}
+
+.contacts.expanded {
     width: 350px;
+    transition: 0.5s;
+    position: absolute;
+    height: 100%;
+    background-color: #e8edec;
+    z-index: 10;
 }
 
 .contacts-list {
@@ -17,6 +30,7 @@
     flex-direction: column;
     padding: 20px 10px 10px 10px;
     justify-content: space-between;
+    overflow-x: hidden;
 }
 
 .contacts-title-title {
@@ -42,4 +56,41 @@
     outline: none;
     background-color: #bbe5dd;
     color: white;
+}
+
+.toggle-contacts-bar {
+    position: absolute;
+    top: 50%;
+    right: -20px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 6px;
+    background-color: rgb(36, 27, 27);
+    cursor: pointer;
+}
+
+.toggle-contacts-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+    font-weight: bold;
+    margin-top: -6px;
+    color: #dddddd;
+}
+
+@media screen and (min-width: 450px) {
+    .contacts {
+        width: 60px;
+        transition: 0.5s;
+        position: relative;
+    }
+    
+    .contacts.expanded {
+        width: 350px;
+        transition: 0.5s;
+        position: relative;
+    }
 }

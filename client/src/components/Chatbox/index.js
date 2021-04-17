@@ -42,7 +42,7 @@ function Chatbox({ selectedContact, selectedContactName, selectContact, sendCall
                         </>
                     ) : <span>Select a contact to start chatting.</span>}
                 </div>
-                <div className={`${!selectedContact || shouldShowAudioCallContainer || shouldShowVideoCallContainer || shouldShowShareFileContainer ? ' disable' : ''}`}>
+                <div className={`call-buttons-container ${!selectedContact || shouldShowAudioCallContainer || shouldShowVideoCallContainer || shouldShowShareFileContainer ? ' disable' : ''}`}>
                     <ShareIcon tooltip="Share File" className="chat-initiators" onClick={() => openFileSharingWidget(selectedContact)} />
                     <VoiceCallIcon tooltip="Voice Call" className="chat-initiators" onClick={() => sendCallRequest(selectedContact, 'audio')} />
                     <VideoCallIcon tooltip="Video Call" className="chat-initiators" onClick={() => sendCallRequest(selectedContact, 'video')} />

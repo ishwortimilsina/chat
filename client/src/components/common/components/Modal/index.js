@@ -9,8 +9,8 @@ const Modal = props => {
             <div
                 className="modal"
                 style={{
-                    height: props.height || 300,
-                    width: props.width || 450,
+                    height: props.height,
+                    width: props.width,
                     backgroundColor: props.backgroundColor || "#e9eaff"
                 }}
             >
