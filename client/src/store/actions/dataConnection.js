@@ -1,7 +1,7 @@
 import { appStore } from '../..';
 import { createPeerConnection } from './peerConnection';
 import { peerConnections } from './connections';
-import { RECEIVE_MESSAGE, SEND_MESSAGE, SHARE_FILE_METADATA } from './actionTypes';
+import { PEER_READY, RECEIVE_MESSAGE, SEND_MESSAGE, SHARE_FILE_METADATA } from './actionTypes';
 import { createDownloadStream, processDownloadStream, processFileShareNegotiation } from './shareFile';
 import { processAudioVideoNegotiation } from './audioVideoCall';
 
@@ -68,13 +68,23 @@ function setupDataConnection(recipientId) {
     const dataChannel = peerConnection.createDataChannel('text-channel', { reliable: true });
     peerConnections[recipientId].dataChannel = dataChannel;
 
+    dataChannel.onopen = (event) => {
+        appStore.dispatch({
+            type: PEER_READY,
+            peerId: recipientId
+        });
+    };
     dataChannel.onerror = (error) => console.log(error);
     dataChannel.onmessage = (msg) => handleChannelMessage(msg, recipientId);
 }
 
 export function initializeSocketForDataConnection(newSocket) {
     newSocket.on('new-contact', data => {
-        setupDataConnection(data.contact.userId);
+        // if it's in the meet-stranger room, only the user with connInitator: true
+        // makes the offer to the other. If both do it, it won't work
+        if (data.roomId !== 'meet-stranger' || data.connInitiator) {
+            setupDataConnection(data.contact.userId);
+        }
     });
 
     // ********************************************************************************

@@ -30,7 +30,7 @@ function Chatbox({ selectedContact, selectedContactName, selectContact, sendCall
                     { selectedContact ? (
                         <>
                             <div className="contact-list-item-img-container">
-                                <img className="contact-list-item-img" src='favicon.ico' alt={selectedContactName} />
+                                <img className="contact-list-item-img" src='/favicon.ico' alt={selectedContactName} />
                             </div>
                             <div className="contact-list-item-details">
                                 <div className="chat-title-name">{selectedContactName}</div>
@@ -75,7 +75,7 @@ const mapStateToProps = (state, ownProps) => ({
     audioCall: state.audioCall,
     videoCall: state.videoCall,
     shareFile: state.shareFile,
-    selectedContactName: (state.contacts.filter(cont => cont.userId === ownProps.selectedContact)[0] || {}).userName
+    selectedContactName: (state.contacts[ownProps.selectedContact] || {}).userName
 });
 
 export default connect(mapStateToProps, { sendCallRequest, openFileSharingWidget })(Chatbox);

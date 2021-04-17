@@ -89,6 +89,8 @@
     align-items: center;
     margin: 20px;
     cursor: pointer;
+    text-decoration: none;
+    color: inherit;
 }
 
 .home-menu-icon {

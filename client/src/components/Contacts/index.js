@@ -12,7 +12,7 @@ function Contacts({ contacts, selectedContact, selectContact }) {
         <div className="contacts">
             <div className="contacts-title">
                 <div className="contacts-title-title">
-                    <img src="favicon.ico" alt="Profile" className="contacts-title-img" />
+                    <img src="/favicon.ico" alt="Profile" className="contacts-title-img" />
                     <div>Chats</div>
                 </div>
                 <SearchContacts searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
@@ -29,8 +29,8 @@ function Contacts({ contacts, selectedContact, selectContact }) {
     );
 }
 
-const mapStateToProps = (state) => {
-    return { contacts: state.contacts };
-}
+const mapStateToProps = (state) => ({
+    contacts: Object.values(state.contacts)
+});
 
 export default connect(mapStateToProps)(Contacts);

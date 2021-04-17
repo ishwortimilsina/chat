@@ -1,0 +1,17 @@
+.room-leave-button {
+    padding: 8px;
+    font-weight: bold;
+    font-size: 0.8em;
+    letter-spacing: 0.05em;
+    border-radius: 5px;
+    background-color: #ba3900;
+    cursor: pointer;
+    min-width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.room-leave-button:hover {
+    background: #9e5a3e;
+}

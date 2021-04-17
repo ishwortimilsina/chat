@@ -28,6 +28,7 @@ function ChatControllers(props) {
                 type="text"
                 className="chatInput"
                 value={text}
+                placeholder="Send text message"
                 onChange={({ target }) => setText(target.value)}
                 disabled={!props.selectedContact}
             />

@@ -12,7 +12,22 @@ const generateRandomString = (length = 12) => {
         str += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
-    return str;
+    if (str === "meet-stranger") {
+        generateRandomString(length);
+    } else {
+        return str;
+    }
+};
+
+/**
+ * 
+ * @param {number} duration // in milliseconds 
+ */
+ function delay(duration) {
+    return new Promise((resolve) => {
+        setTimeout(() => resolve(), duration);
+    });
 };
 
 exports.generateRandomString = generateRandomString;
+exports.delay = delay;

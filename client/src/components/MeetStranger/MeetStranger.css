@@ -1,0 +1,110 @@
+.meet-stranger-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 50px);
+    justify-content: center;
+    align-items: center;
+}
+
+.meet-stranger-main-container {
+    display: flex;
+    padding: 30px 50px;
+    width: 100%;
+    flex: 1;
+    overflow: hidden;
+}
+
+.meet-stranger-page-loading {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.meet-stranger-video-area {
+    flex: 1;
+    display: flex;
+}
+
+.meet-stranger-text-chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #e9eaff;
+    box-shadow: 3px 2px 10px 1px rgb(0 0 0 / 10%);
+}
+
+.meet-stranger-text-chat-area-inner {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.meet-stranger-video {
+    width: 100%;
+    object-fit: fill;
+}
+
+.text-chat-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 20px;
+    background-color: #606174;
+    color: #ffe0e0;
+    width: 100%;
+}
+
+.text-chat-title .title-name {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.text-chat-title .room-leave-button {
+    padding: 10px;
+    font-weight: bold;
+    font-size: 0.9em;
+    letter-spacing: 0.05em;
+    border-radius: 5px;
+    background-color: #7688b8;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.text-chat-title  .room-leave-button:hover {
+    background: #5d6fa0;
+}
+
+.text-chat-title  .room-leave-button:active {
+    background: #8891aa;
+}
+
+.placeholder-video-poster {
+    background-color: black;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: lightgrey;
+    font-size: 2em;
+}
+
+.meet-stranger-video-area .remote-video-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+}
+
+.meet-stranger-video-area .remote-video {
+    width: 100%;
+    min-width: 200px;
+    object-fit: cover;
+    height: 100%;
+}

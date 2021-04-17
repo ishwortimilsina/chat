@@ -1,6 +1,16 @@
 import { appStore } from '../..';
-import { JOIN_ROOM, LEAVE_ROOM } from './actionTypes';
-import { newSocket } from './socket';
+import { JOIN_ROOM, LEAVE_ROOM, REMOVE_CONTACT } from './actionTypes';
+import { endAudioVideoCall, leaveChat } from './audioVideoCall';
+
+let newSocket;
+
+export function initializeSocketForRooms(currentSocket) {
+    newSocket = currentSocket;
+
+    newSocket.on('stranger-left', ({ strangerId }) => {
+        getNextStranger(strangerId);
+    });
+}
 
 export async function checkRoomExists(roomId) {
     const _this = {};
@@ -15,11 +25,11 @@ export async function checkRoomExists(roomId) {
     });
 }
 
-export async function createRoom({ roomName }) {
+export async function createRoom({ roomName, roomType }) {
     const _this = {};
     return new Promise((resolve) => {
         if (newSocket) {
-            newSocket.emit('create-room', { roomName });
+            newSocket.emit('create-room', { roomName, roomType });
             _this.res = newSocket.on('create-room', ({ roomId, success, msg }) => {
                 resolve({ roomId, success, msg });
                 _this.res = null;
@@ -28,11 +38,11 @@ export async function createRoom({ roomName }) {
     });
 }
 
-export async function joinRoom({ roomId }) {
+export async function joinRoom({ roomId, roomType }) {
     const _this = {};
     return new Promise((resolve) => {
         if (newSocket) {
-            newSocket.emit('join-room', { roomId });
+            newSocket.emit('join-room', { roomId, roomType });
             _this.res = newSocket.on('join-room', ({ roomId, roomName, success, msg }) => {
                 if (success) {
                     appStore.dispatch({
@@ -64,4 +74,65 @@ export async function leaveRoom({ roomId }) {
             });
         }
     });
+}
+
+export async function addUserName(userName) {
+    const _this = {};
+    return new Promise((resolve) => {
+        if (newSocket) {
+            newSocket.emit('add-user-name', { userName });
+            _this.res = newSocket.on('add-user-name', () => {
+                resolve(true);
+                _this.res = null;
+            });
+        }
+    });
+}
+
+export async function joinMeetStrangerRoom() {
+    const _this = {};
+    return new Promise((resolve) => {
+        if (newSocket) {
+            newSocket.emit('join-meet-stranger-room');
+            _this.res = newSocket.on('join-meet-stranger-room', ({ success, msg }) => {
+                if (success) {
+                    appStore.dispatch({
+                        type: JOIN_ROOM,
+                        roomId: 'meet-stranger'
+                    });
+                }
+                resolve({ success, msg });
+                _this.res = null;
+            });
+        }
+    });
+}
+
+export async function leaveMeetStrangerRoom(strangerId) {
+    appStore.dispatch({
+        type: LEAVE_ROOM,
+        roomId: 'meet-stranger'
+    });
+    endAudioVideoCall(strangerId, 'video');
+    leaveChat(strangerId, 'video');
+
+    if (newSocket) {
+        newSocket.emit('leave-meet-stranger-room');
+    }
+}
+
+export function getNextStranger(strangerId) {
+    // first remove this user from the contact list
+    // this will trigger other cleanups (eg. messages) as well
+    appStore.dispatch({
+        type: REMOVE_CONTACT,
+        roomId: 'meet-stranger',
+        contact: { userId: strangerId }
+    });
+    endAudioVideoCall(strangerId, 'video');
+    leaveChat(strangerId, 'video');
+
+    if (newSocket) {
+        newSocket.emit('get-next-stranger', { strangerId });
+    }
 }

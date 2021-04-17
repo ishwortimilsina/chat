@@ -1,25 +1,25 @@
 import { useContext, useEffect, useState } from "react";
-import { connect } from 'react-redux';
 
 import { AppContext } from "../../contexts/AppContext";
-import { establishConnection } from "../../store/actions";
+import { addUserName } from "../../store/actions";
 import Modal from "../common/components/Modal";
 import LoadingIcon from "../common/icons/LoadingIcon";
 
 import './Landing.css';
 
-function LoginForm({ establishConnection }) {
+export default function LoginForm({ changeIsUserNameSet }) {
     const { userId, userName } = useContext(AppContext);
     const [name, setName] = useState(userName);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => setName(userName), [userName]);
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (name) {
-            establishConnection(userId, name);
-
             setIsSubmitting(true);
+            await addUserName(name);
+            setIsSubmitting(false);
+            changeIsUserNameSet(true);
             localStorage.setItem('chat-identity', JSON.stringify({ userName: name }));
         }
     };
@@ -58,5 +58,3 @@ function LoginForm({ establishConnection }) {
         </div>
     );
 }
-
-export default connect(null, { establishConnection })(LoginForm);

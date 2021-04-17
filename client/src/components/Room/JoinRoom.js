@@ -11,10 +11,10 @@ export default function JoinRoom({ goBack }) {
     const [ roomId, setRoomId ] = useState('');
     const [ roomLink, setRoomLink ] = useState('');
 
-    const handleLinkChange = ({ target }) => {
-        setRoomLink(target.value);
-        const roomId = target.value.split(`${window.location.hostname}/`)[1];
-        setRoomId(roomId);
+    const handleRoomIdChange = ({ target }) => {
+        setRoomId(target.value);
+        const roomLink = `${window.location.hostname}${window.location.port ? ':'+window.location.port : ''}/meet/${target.value}`;
+        setRoomLink(roomLink);
     };
 
     const handleJoin = () => {
@@ -33,25 +33,25 @@ export default function JoinRoom({ goBack }) {
                 JOIN ROOM
             </div>
             <div className="room-form-body join-room-form">
+                <label>Room ID</label>
+                <input
+                    className="room-form-input"
+                    type="text"
+                    value={roomId || ''}
+                    onChange={handleRoomIdChange}
+                    placeholder="Room ID"
+                />
                 <div className="room-link">
                     <label>Room URL</label>
                     <input
                         className="room-form-input"
                         type="text"
                         value={roomLink}
-                        onChange={handleLinkChange}
+                        onChange={null}
                         placeholder="Room URL"
+                        disabled
                     />
                 </div>
-                <label>Room ID</label>
-                <input
-                    className="room-form-input"
-                    type="text"
-                    value={roomId || ''}
-                    onChange={null}
-                    placeholder="Room ID"
-                    disabled
-                />
             </div>
             <div className="room-form-footer">
                 <div className={`room-submit-button${roomId ? '' : ' disable'}`} onClick={handleJoin}>

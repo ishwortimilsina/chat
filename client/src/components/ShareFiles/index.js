@@ -4,13 +4,12 @@ import { RoomContext } from '../../contexts/RoomContext';
 
 import { joinRoom } from '../../store/actions';
 import { delay } from '../../utils/utils';
+import LeaveRoomButton from '../common/components/LeaveRoomButton';
 import Modal from '../common/components/Modal';
 import LoadingIcon from '../common/icons/LoadingIcon';
 import LoginForm from '../Landing/LoginForm';
-import MainContainer from '../MainContainer';
-import './Room.css';
 
-export default function Room({ currentRoomId }) {
+export default function ShareFiles({ currentRoomId }) {
     const [ location, setLocation ] = useLocation();
     const [ isUserNameSet, changeIsUserNameSet ] = useState(false);
     const [ roomName, setRoomName ] = useState('');
@@ -22,7 +21,7 @@ export default function Room({ currentRoomId }) {
             (async function joiningRoom() {
                 await delay(1000);
 
-                const { roomId, roomName, success } = await joinRoom({ roomId: currentRoomId, roomType: 'meet' });
+                const { roomId, roomName, success } = await joinRoom({ roomId: currentRoomId, roomType: 'share-files' });
 
                 setIsChecking(false);
 
@@ -39,6 +38,7 @@ export default function Room({ currentRoomId }) {
 
     return (
         <RoomContext.Provider value={{ roomId: currentRoomId, roomName }}>
+            <LeaveRoomButton roomId={currentRoomId} />
             <div className="room-page">
                 {
                     !isUserNameSet ? (
@@ -48,7 +48,7 @@ export default function Room({ currentRoomId }) {
                             <LoadingIcon style={{ height: 180, width: 180 }} />
                         </div>
                     ) : isAvailable ? (
-                        <MainContainer />
+                        <div>This is share-files room </div>
                     ) : (
                         <Modal backgroundColor="rgb(177 198 229)">
                             <div className="no-room-msg">
