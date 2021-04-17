@@ -32,7 +32,6 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100%;
     padding: 15px 20px 20px 20px;
 }
 
@@ -40,8 +39,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 30px;
-    letter-spacing: 0.4em;
+    font-size: 20px;
+    letter-spacing: 0.3em;
     color: #496691;
     margin-bottom: 20px;
     flex-direction: column;
@@ -79,13 +78,13 @@
 }
 
 .room-form-input {
-    padding: 10px 20px;
-    font-size: 1.4em;
+    padding: 5px 10px;
+    font-size: 1.2em;
     border-radius: 8px;
     border: none;
     outline: none;
     margin: 12px 0;
-    height: 70px;
+    height: 50px;
     color: #19007c;
     background-color: #f3ffff;
 }
@@ -96,7 +95,7 @@
 }
 
 .room-link {
-    margin-top: 50px;
+    margin-top: 25px;
 }
 
 .join-room-form .room-link {
@@ -108,7 +107,7 @@
 
 .room-link-link {
     border: solid thin lightgrey;
-    padding: 10px;
+    padding: 8px;
     display: flex;
     justify-content: space-between;
 }
@@ -134,4 +133,38 @@
 .copied-msg {
     color: green;
     align-self: flex-end;
+}
+
+@media screen and (min-width: 480px) {
+    .room-form-header {
+        font-size: 30px;
+    }
+    
+    .room-form-input {
+        padding: 10px 20px;
+        font-size: 1.4em;
+        border-radius: 8px;
+        margin: 12px 0;
+        height: 70px;
+    }
+    
+    .room-form label {
+        font-size: 1.2em;
+        margin-bottom: -10px;
+    }
+    
+    .join-room-form .room-link {
+        margin-top: 30px;
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .room-link {
+        margin-top: 50px;
+    }
+    
+    .room-link-link {
+        padding: 10px;
+    }
 }
