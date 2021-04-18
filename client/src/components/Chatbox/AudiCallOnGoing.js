@@ -20,7 +20,7 @@ export default function AudioCallOngoing({ endAudioVideoCall, audioCall }) {
         <>
             <div className="remote-audio-container">
                 <UserCircleIcon className="audio-ongoing-user-img" />
-                <div>Call on-going with {audioCall.otherUser}</div>
+                <div style={{ textAlign: "center" }}>Call on-going with {audioCall.otherUser}</div>
                 <div className="ongoing-call-timer">{durationString}</div>
                 <audio ref={remoteAudioRef} autoPlay></audio> 
             </div>

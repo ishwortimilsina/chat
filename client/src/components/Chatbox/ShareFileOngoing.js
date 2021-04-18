@@ -26,7 +26,7 @@ export default function ShareFileOngoing({ requestShareFile, endFileSharing, sha
                 {
                     shareFile.uploadProgress ? (
                         <>
-                            <span>Uploading</span>
+                            <span>{shareFile.uploadProgress == 100 ? 'Uploaded' : 'Uploading'}</span>
                             <span className="sharing-file-name" title={shareFile.shareFileMetadata.fileName}>
                                 {shareFile.shareFileMetadata.fileName}
                             </span>
@@ -41,7 +41,7 @@ export default function ShareFileOngoing({ requestShareFile, endFileSharing, sha
                 {
                     shareFile.downloadProgress ? (
                         <>
-                            <span>Downloading</span>
+                            <span>{shareFile.downloadProgress == 100 ? 'Downloaded' : 'Downloading'}</span>
                             <span className="sharing-file-name" title={shareFile.shareFileMetadata.fileName}>
                                 {shareFile.shareFileMetadata.fileName}
                             </span>

@@ -1,5 +1,5 @@
 .room-page {
-    min-height: 100vh;
+    min-height: calc(100vh - 75px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -136,6 +136,13 @@
 }
 
 @media screen and (min-width: 480px) {
+    .room-page {
+        min-height: calc(100vh - 50px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     .room-form-header {
         font-size: 30px;
     }

@@ -6,6 +6,7 @@
     transition: 0.5s;
     height: 100%;
     box-shadow: 1px 0px 5px lightslategrey;
+    z-index: 10;
 }
 
 .contacts.expanded {

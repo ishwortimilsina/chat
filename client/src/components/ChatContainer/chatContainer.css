@@ -5,4 +5,5 @@
     height: 100%;
     background-color: #e8edec;
     box-shadow: 3px 3px 10px lightslategrey;
+    position: relative;
 }

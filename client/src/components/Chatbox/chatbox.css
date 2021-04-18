@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-    height: calc(100% - 50px);
+    height: 100%;
     padding-left: 60px;
 }
 
@@ -159,7 +159,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 20px 0;
+    margin: 10px 0;
 }
 
 .local-video-container {
@@ -168,6 +168,7 @@
 
 .remote-video-container {
     height: 100%;
+    width: 100%;
 }
 
 .local-video {
@@ -251,8 +252,8 @@
 }
 
 .audio-ongoing-user-img {
-    height: 300px;
-    width: 300px;
+    height: 150px;
+    width: 150px;
 }
 
 .ongoing-call-timer {
@@ -379,6 +380,11 @@
         flex-direction: row;
         height: 100%;
         width: 100%;
+    }
+
+    .audio-ongoing-user-img {
+        height: 300px;
+        width: 300px;
     }
 
     .chatInput {
