@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import UserCircleIcon from '../../common/icons/UserCircleIcon';
 import './contactListItem.css';
 
 export default function ContactListItem({ item, isSelected, selectContact }) {
@@ -14,7 +15,7 @@ export default function ContactListItem({ item, isSelected, selectContact }) {
             onClick={() => selectContact(item.userId)}
         >
             <div className="contact-list-item-img-container">
-                <img className="contact-list-item-img" src='/favicon.ico' alt={item.userName} />
+                <UserCircleIcon className="contact-list-item-img" />
             </div>
             <div className="contact-list-item-details">
                 <div className="contact-list-item-name">{item.userName || item.userId}</div>

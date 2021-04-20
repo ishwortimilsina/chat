@@ -70,12 +70,13 @@
 }
 
 .no-contact-selected-icon {
-    height: 120px;
+    height: 80px;
 }
 
 .empty-messages-message {
     color: #721717;
     font-weight: bold;
+    font-size: 0.8em;
 }
 
 .chat-title-bar {
@@ -84,13 +85,14 @@
     align-items: center;
     justify-content: space-between;
     border-bottom: 2px solid #a5b0bc;
-    height: 75px;
+    height: 50px;
     padding: 0 10px;
 }
 
 .chat-title {
     display: flex;
     color: #273159;
+    font-size: 0.8em;
 }
 
 .chat-title-name {
@@ -108,8 +110,8 @@
 
 .chat-initiators {
     margin-left: 15px;
-    height: 32px;
-    width: 32px;
+    height:28px;
+    width: 28px;
     cursor: pointer;
     color: #a01e1e;
 }
@@ -409,5 +411,18 @@
     .sendButton {
         height: 40px;
         width: 40px;
+    }
+
+    .chat-title {
+        font-size: 1em;
+    }
+
+    .chat-initiators {
+        height:32px;
+        width: 32px;
+    }
+
+    .chat-title-bar {
+        height: 60px;
     }
 }

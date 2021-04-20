@@ -6,6 +6,7 @@ import './contacts.css';
 import { connect } from 'react-redux';
 import { SearchContacts } from './SearchContacts';
 import ArrowLeftIcon from '../common/icons/ArrowLeftIcon';
+import UserCircleIcon from '../common/icons/UserCircleIcon';
 
 function Contacts({ contacts, selectedContact, selectContact }) {
     const [searchTerm, setSearchTerm] = useState('');
@@ -19,7 +20,7 @@ function Contacts({ contacts, selectedContact, selectContact }) {
         <div className={`contacts${isExpanded ? ' expanded': ''}`}>
             <div className="contacts-title">
                 <div className="contacts-title-title">
-                    <img src="/favicon.ico" alt="Profile" className="contacts-title-img" />
+                    <UserCircleIcon className="contacts-title-img" />
                     <div>Chats</div>
                 </div>
                 <SearchContacts searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
