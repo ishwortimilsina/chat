@@ -1,0 +1,367 @@
+.chatbox {
+    border-left: thin solid #a5b0bc;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+}
+
+.messages-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.chat-controllers {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.chatInput {
+    padding: 10px 20px;
+    font-size: 1.3em;
+    flex: 1;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    background-color: #bbe5dd;
+    color: #0f5941;
+}
+
+.sendButton {
+    height: 40px;
+    width: 40px;
+    cursor: pointer;
+    margin-left: 10px;
+    color: #35597e;
+}
+
+.sendButton:hover {
+    color: #35597e;
+}
+
+.each-message {
+    padding: 8px 10px;
+    background-color: #36efcb;
+    align-self: flex-start;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    min-height: 25px;
+    color: darkblue;
+}
+
+.own-message {
+    background-color: #5151ff;
+    align-self: flex-end;
+    color: white;
+}
+
+.empty-messages-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.no-contact-selected-icon {
+    height: 120px;
+}
+
+.empty-messages-message {
+    color: #721717;
+    font-weight: bold;
+}
+
+.chat-title-bar {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #a5b0bc;
+    height: 75px;
+    padding: 0 10px;
+}
+
+.chat-title {
+    display: flex;
+    color: #273159;
+}
+
+.chat-title-name {
+    font-weight: bold;
+}
+
+.chat-title-availability {
+    display: flex;
+    align-items: center;
+}
+
+.chat-title-availability > div {
+    margin-right: 10px;
+}
+
+.chat-initiators {
+    margin-left: 15px;
+    height: 32px;
+    width: 32px;
+    cursor: pointer;
+    color: #a01e1e;
+}
+
+.chat-initiators:hover {
+    font-weight: bold;
+}
+
+.disable {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.audios-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.local-audio-container, .remote-audio-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+}
+
+.videos-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 100%;
+}
+
+.actual-videos-container {
+    position: relative;
+    /* display: flex; */
+    height: 100%;
+    width: 100%;
+}
+
+.local-video-container, .remote-video-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.local-video-container {
+    align-self: flex-end;
+    position: absolute;
+    bottom: 10%;
+    right: 5%;
+}
+
+.remote-video-container {
+    height: 100%;
+    object-fit: cover;
+}
+
+.local-video {
+    width: 200px;
+}
+
+.remote-video {
+    width: 100%;
+    min-width: 200px;
+    object-fit: contain;
+    height: 100%;
+}
+
+.video-call-end-call-button {
+    position: absolute;
+    bottom: 10%;
+    left: 45%;
+}
+
+.call-buttons {
+    padding: 8px 15px;
+    border: solid thin #929eaa;
+    max-width: 100px;
+    cursor: pointer;
+    margin: 10px 0;
+}
+
+.end-button {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+}
+
+.call-buttons:hover {
+    background-color: #b6bec5;
+    color: #35597e;
+}
+
+.outgoing-call, .incoming-call {
+    height: 100px;
+    width: 100px;
+    color: green;
+}
+
+.missed-call {
+    height: 100px;
+    width: 100px;
+    color: #b82121;
+}
+
+.accept-reject-buttons-container {
+    display: flex;
+}
+
+.accept-reject-buttons-container > div {
+    margin-right: 20px;
+}
+
+.end-call-button, .accept-call-button {
+    padding: 8px 15px 4px 15px;
+    border-radius: 10px;
+    width: 80px;
+    background-color: white;
+    cursor: pointer;
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.end-call-button:hover, .end-call-button:active {
+    background-color: rgb(212, 181, 181);
+}
+
+.accept-call-button:hover, .accept-call-button:active {
+    background-color: rgb(173, 211, 170);
+}
+
+.audio-ongoing-user-img {
+    height: 300px;
+    width: 300px;
+}
+
+.ongoing-call-timer {
+    font-size: 30px;
+    font-weight: bold;
+    color: #a63a3a;
+}
+
+.share-file-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.share-file-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    overflow: hidden;
+}
+
+.share-file-file-upload-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#share-file-file-upload {
+    display: none;
+}
+
+.custom-share-file-upload {
+    background: #ddd;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 8px 10px;
+}
+
+.custom-share-file-upload:hover {
+    background: #afb0c0;
+}
+
+.custom-share-file-upload:active {
+    background: #9697a3;
+}
+
+.file-upload-filename {
+    margin-left: 15px;
+    font-weight: bold;
+    color: black;
+}
+
+.share-file-submit {
+    margin-top: 25px;
+    padding: 8px 10px;
+    font-weight: bold;
+    border-radius: 5px;
+    background: #ddd;
+    cursor: pointer;
+    min-width: 80px;
+    display: flex;
+    justify-content: center;
+}
+
+.share-file-submit:hover {
+    background: #afb0c0;
+}
+
+.share-file-submit:active {
+    background: #9697a3;
+}
+
+.download-file-button {
+    text-decoration: none;
+    margin-top: 25px;
+    padding: 8px 10px;
+    font-weight: bold;
+    border-radius: 5px;
+    background: #a74629;
+    cursor: pointer;
+    min-width: 80px;
+    display: flex;
+    justify-content: center;
+    color: black;
+}
+
+.download-file-button:hover {
+    background: #afb0c0;
+}
+
+.download-file-button:active {
+    background: #9697a3;
+}
+
+.sharing-file-name {
+    font-weight: bold;
+    font-size: 1.2em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 20px 0;
+}
+
+.upload-download-progressbar {
+    height: 30px;
+    width: 70%;
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 10px 0;
+}

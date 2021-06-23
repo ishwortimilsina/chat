@@ -1,0 +1,137 @@
+.room-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.no-room-msg {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 1.3em;
+}
+
+.no-room-msg > strong {
+    font-size: 1.8em;
+    margin-bottom: 20px;
+}
+
+.go-back-button {
+    position: absolute;
+    cursor: pointer;
+}
+
+.go-back-button:hover {
+    opacity: 0.6;
+}
+
+.room-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 15px 20px 20px 20px;
+}
+
+.room-form-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    letter-spacing: 0.4em;
+    color: #496691;
+    margin-bottom: 20px;
+    flex-direction: column;
+}
+
+.room-form-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.room-submit-button {
+    margin-top: 25px;
+    padding: 8px 10px;
+    font-weight: bold;
+    font-size: 1.4em;
+    letter-spacing: 0.05em;
+    border-radius: 5px;
+    background-color: #ced2ff;
+    cursor: pointer;
+    min-width: 80px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.room-submit-button:hover {
+    background: #8f94dd;
+}
+
+.room-submit-button:active {
+    background: #343b8a;
+    color: white;
+}
+
+.room-form-input {
+    padding: 10px 20px;
+    font-size: 1.4em;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    margin: 12px 0;
+    height: 70px;
+    color: #19007c;
+    background-color: #f3ffff;
+}
+
+.room-form label {
+    font-size: 1.2em;
+    margin-bottom: -10px;
+}
+
+.room-link {
+    margin-top: 50px;
+}
+
+.join-room-form .room-link {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.room-link-link {
+    border: solid thin lightgrey;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.room-link-link > span {
+    flex: 1;
+}
+
+.join-room-form .room-link-link {
+    width: 100%;
+}
+
+.copy-room-link {
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+}
+
+.copy-room-link:hover, .copy-room-link:active {
+    opacity: 0.7;
+}
+
+.copied-msg {
+    color: green;
+    align-self: flex-end;
+}

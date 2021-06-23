@@ -1,0 +1,42 @@
+.main-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #273159;
+    height: 100vh;
+    letter-spacing: 1px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.room-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 20px;
+    background-color: #5f5555;
+    color: #ffe0e0;
+}
+
+.room-title .room-name {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.room-title .room-leave-button {
+    padding: 10px;
+    font-weight: bold;
+    font-size: 1em;
+    letter-spacing: 0.05em;
+    border-radius: 5px;
+    background-color: #ba3900;
+    cursor: pointer;
+    min-width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.room-title  .room-leave-button:hover {
+    background: #9e5a3e;
+}

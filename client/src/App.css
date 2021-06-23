@@ -1,0 +1,14 @@
+.App {
+    text-align: justify;
+    background-color: #eefffd;
+    font-family: Segoe UI Historic, Segoe UI, Helvetica, Arial, sans-serif;
+    color: #923107;
+}
+
+.App-link {
+    color: #61dafb;
+}
+
+.disable {
+    pointer-events: none;
+}
